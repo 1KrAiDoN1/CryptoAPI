@@ -1,15 +1,22 @@
-{{ define "show_info" }}
-
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Coin Information</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Данные о криптовалюте</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 50%; margin: 20px auto; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+        th { background-color: #f2f2f2; }
+    </style>
 </head>
 <body>
-    <h1>Инфо про монету</h1>
-    <p>Название: {{.Coin.Name}}</p>
-    <p>Цена (USD): {{.Coin.PriceUsd}}</p>
+    <h1 style="text-align:center;">Данные о криптовалюте {{.Name}}</h1>
+    <table>
+        <tr><th>Поле</th><th>Значение</th></tr>
+        <tr><td>Цена (USD)</td><td>{{.PriceUsd}}</td></tr>
+    </table>
 </body>
 </html>
 
-{{ end }}

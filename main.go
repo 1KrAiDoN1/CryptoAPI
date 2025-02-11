@@ -4,111 +4,111 @@ import (
 	"encoding/json"
 	"fmt"
 
-	//"helloapp/coincap"
+	"helloapp/coincap"
 	"html/template"
 	"io"
 
-	//"log"
+	"log"
 	"net/http"
-	//"time"
+	"time"
 )
 
 func main() {
 
-	// client := &http.Client{}
-	// r, err := client.Get("https://api.coincap.io/v2/assets/")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer r.Body.Close()
-	// if r.StatusCode != http.StatusOK {
-	// 	log.Fatal(r.Status)
-	// }
+	client := &http.Client{}
+	r, err := client.Get("https://api.coincap.io/v2/assets/")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer r.Body.Close()
+	if r.StatusCode != http.StatusOK {
+		log.Fatal(r.Status)
+	}
 	// body, err := io.ReadAll(r.Body)
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
 	// fmt.Println(string(body))
 
-	// coincapClient, err := coincap.NewClient(time.Second * 10)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// assets, err := coincapClient.GetAssets()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// for _, asset := range assets {
-	// 	fmt.Println(asset.CorrectPrint())
-	// }
+	coincapClient, err := coincap.NewClient(time.Second * 10)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// bitcoin, err := coincapClient.GetAsset("bitcoin")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(bitcoin.CorrectPrint())
+	bitcoin, err := coincapClient.GetAsset("bitcoin")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(bitcoin.CorrectPrint())
 
 	//
 	//
 	//
-	clientUser := &http.Client{}
-	nameCrypto := "xrp"
-	responseClient, err := clientUser.Get(GetURL(nameCrypto))
-	if err != nil {
-		fmt.Println("Ошибка в получении данных", err)
-	}
-	defer responseClient.Body.Close()
 
-	bodyResponse, err := io.ReadAll(responseClient.Body)
-	if err != nil {
-		fmt.Println("Ошибка в чтении данных", err)
-	}
-	fmt.Println(string(bodyResponse))
+	//CoinStack := fmt.Sprintf("ID: %s, Название: %s, Цена: %s", xrp.Coin.ID, xrp.Coin.Name, xrp.Coin.PriceUsd)
+	// fmt.Println(CoinStack)
+	// fmt.Println(xrp.Coin.ID, xrp.Coin.PriceUsd)
 
-	var xrp CoinsStruct
-
-	err = json.Unmarshal(bodyResponse, &xrp)
-	if err != nil {
-		fmt.Println("Ошибка при дессериализации", err)
-	}
-	CoinStack := fmt.Sprintf("ID: %s, Название: %s, Цена: %s", xrp.Coin.ID, xrp.Coin.Name, xrp.Coin.PriceUsd)
-	fmt.Println(CoinStack)
-	fmt.Println(xrp.Coin.ID, xrp.Coin.PriceUsd)
-
-	HandleFunc(xrp)
+	HandleFunc()
 
 }
-func HandleFunc(xrp CoinsStruct) {
-	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
-		showInfo(w, r, xrp) // Передаем данные о криптовалюте в обработчик
-	})
+func HandleFunc() {
+	http.HandleFunc("/home", showInfo) // Передаем данные о криптовалюте в обработчик
 	fmt.Println("Сервер запущен")
 	http.ListenAndServe(":8080", nil)
 }
 
-func showInfo(w http.ResponseWriter, r *http.Request, xrp CoinsStruct) {
-	Example := CoinStruct{
-		Name:     xrp.Coin.Name,
-		PriceUsd: xrp.Coin.PriceUsd,
+func showInfo(w http.ResponseWriter, r *http.Request) {
+	output, err := getCryptoData()
+	if err != nil {
+		fmt.Println("Ошибка при получении данных", err, http.StatusInternalServerError)
+		return
 	}
+	fmt.Printf("Данные для шаблона: %+v\n", output)
+	// Используем ParseFiles для загрузки шаблона из файла
 	tmpl, err := template.ParseFiles("home.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = tmpl.Execute(w, Example)
+
+	// Выполняем шаблон с данными
+	err = tmpl.Execute(w, output)
 	if err != nil {
-		fmt.Println("Ошибка при отображении данных", err)
+		http.Error(w, "Ошибка при обработке шаблона", http.StatusInternalServerError)
+		return
 	}
 }
 
-func GetURL(nameCrypto string) string {
-	return fmt.Sprintf("https://api.coincap.io/v2/assets/%s", nameCrypto)
+func GetURL() string {
+	return "https://api.coincap.io/v2/assets/xrp"
 }
 
 // func (d CoinStruct) PostInfoCrypto(w http.ResponseWriter, r *http.Request) {
 
 // }
+
+func getCryptoData() (CoinStruct, error) {
+	clientUser := &http.Client{}
+	response, err := clientUser.Get(GetURL())
+	if err != nil {
+		return CoinStruct{}, err
+	}
+	defer response.Body.Close()
+
+	bodyResponse, err := io.ReadAll(response.Body)
+	if err != nil {
+		return CoinStruct{}, err
+	}
+
+	var result CoinsStruct
+	err = json.Unmarshal(bodyResponse, &result)
+	if err != nil {
+		return CoinStruct{}, err
+	}
+
+	return result.Coin, nil
+}
 
 type CoinsStruct struct {
 	Coin  CoinStruct `json:"data"`
