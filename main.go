@@ -1,12 +1,12 @@
 package main
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"fmt"
 
 	//"helloapp/coincap"
 	"html/template"
-	//"io"
+	"io"
 
 	//"log"
 	"net/http"
@@ -59,23 +59,23 @@ func main() {
 	}
 	defer responseClient.Body.Close()
 
-	// bodyResponse, err := io.ReadAll(responseClient.Body)
-	// if err != nil {
-	// 	fmt.Println("Ошибка в чтении данных", err)
-	// }
-	//fmt.Println(string(bodyResponse))
+	bodyResponse, err := io.ReadAll(responseClient.Body)
+	if err != nil {
+		fmt.Println("Ошибка в чтении данных", err)
+	}
+	fmt.Println(string(bodyResponse))
+
 	var xrp CoinsStruct
-	fmt.Println(xrp.Coin.PriceUsd)
 
-	// err = json.Unmarshal(bodyResponse, &xrp)
-	// if err != nil {
-	// 	fmt.Println("Ошибка при дессериализации", err)
-	// }
-	// CoinStack := fmt.Sprintf("ID: %s, Название: %s, Цена: %s", xrp.Coin.ID, xrp.Coin.Name, xrp.Coin.PriceUsd)
-	// fmt.Println(CoinStack)
-	// fmt.Println(xrp.Coin.ID, xrp.Coin.PriceUsd)
+	err = json.Unmarshal(bodyResponse, &xrp)
+	if err != nil {
+		fmt.Println("Ошибка при дессериализации", err)
+	}
+	CoinStack := fmt.Sprintf("ID: %s, Название: %s, Цена: %s", xrp.Coin.ID, xrp.Coin.Name, xrp.Coin.PriceUsd)
+	fmt.Println(CoinStack)
+	fmt.Println(xrp.Coin.ID, xrp.Coin.PriceUsd)
 
-	//HandleFunc(xrp)
+	HandleFunc(xrp)
 
 }
 func HandleFunc(xrp CoinsStruct) {
@@ -87,13 +87,19 @@ func HandleFunc(xrp CoinsStruct) {
 }
 
 func showInfo(w http.ResponseWriter, r *http.Request, xrp CoinsStruct) {
+	Example := CoinStruct{
+		Name:     xrp.Coin.Name,
+		PriceUsd: xrp.Coin.PriceUsd,
+	}
 	tmpl, err := template.ParseFiles("home.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	tmpl.Execute(w, xrp)
-	//tmpl.ExecuteTemplate(w, "show_info", xrp)
+	err = tmpl.Execute(w, Example)
+	if err != nil {
+		fmt.Println("Ошибка при отображении данных", err)
+	}
 }
 
 func GetURL(nameCrypto string) string {
