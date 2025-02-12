@@ -4,24 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; }
-        table { width: 50%; margin: 20px auto; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
-        th { background-color: #f2f2f2; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin: 0;
+        }
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            transition: transform 0.2s;
+        }
+        table:hover {
+            transform: scale(1.02);
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        footer {
+            margin-top: auto;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            width: 100%;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1 style="text-align:center;">Crypto Market</h1>
-    <table>
-        <tr><th>Name</th><th>Price (USD)</th></tr>
-        {{range .}}
-        <tr>
-            <td>{{.Name}}</td>
-            <td>$ {{.PriceUsd}}</td>
-        </tr>
-        {{end}}
-    </table>
+    <header>
+        <h1>Crypto Market</h1>
+    </header>
+    <main>
+        <table>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Price (USD)</th>
+                <th>Trading Volume (24ч)</th>
+                <th>Changes (24ч)</th>
+            </tr>
+            {{range .}}
+            <tr>
+                <td>{{.Rank}}</td>
+                <td>{{.Name}}</td>
+                <td>{{.PriceUsd}}</td>
+                <td>{{.VolumeUsd24Hr}}</td>
+                <td>{{.ChangePercent24Hr}}%</td>
+            </tr>
+            {{end}}
+        </table>
+    </main>
+    <footer>
+        <p>© 2025 Crypto Market</p>
+    </footer>
 </body>
 </html>
 

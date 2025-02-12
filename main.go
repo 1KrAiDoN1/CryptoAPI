@@ -7,9 +7,9 @@ import (
 	"helloapp/coincap"
 	"html/template"
 	"io"
-
 	"log"
 	"net/http"
+
 	"time"
 )
 
@@ -66,7 +66,6 @@ func main() {
 	//CoinStack := fmt.Sprintf("ID: %s, Название: %s, Цена: %s", xrp.Coin.ID, xrp.Coin.Name, xrp.Coin.PriceUsd)
 	// fmt.Println(CoinStack)
 	// fmt.Println(xrp.Coin.ID, xrp.Coin.PriceUsd)
-
 	HandleFunc()
 
 }
@@ -101,7 +100,7 @@ func showInfo(w http.ResponseWriter, r *http.Request) {
 
 func getCryptoData() ([]CoinStruct, error) {
 	var CryptoBase []CoinStruct
-	for _, id := range SliceOfNameCrypto {
+	for _, id := range SliceOfNameCrypto[:10] {
 		clientUser := &http.Client{}
 		response, err := clientUser.Get(fmt.Sprintf("https://api.coincap.io/v2/assets/%s", id))
 		if err != nil {
@@ -176,3 +175,23 @@ type CoinStruct struct {
 	ChangePercent24Hr string `json:"changePercent24Hr"`
 	Vwap24Hr          string `json:"vwap24Hr"`
 }
+
+// func FormatLargeNumber(num string) string {
+// 	// Парсим строку в число с плавающей точкой
+// 	f, err := strconv.ParseFloat(num, 64)
+// 	if err != nil {
+// 		return "N/A" // Возвращаем "N/A", если число невалидно
+// 	}
+
+// 	// Форматируем число в зависимости от его величины
+// 	switch {
+// 	case f >= 1e12: // Триллионы
+// 		return fmt.Sprintf("%.2fT", f/1e12)
+// 	case f >= 1e9: // Миллиарды
+// 		return fmt.Sprintf("%.2fB", f/1e9)
+// 	case f >= 1e6: // Миллионы
+// 		return fmt.Sprintf("%.2fM", f/1e6)
+// 	default: // Меньше миллиона
+// 		return fmt.Sprintf("%.2f", f)
+// 	}
+// }
