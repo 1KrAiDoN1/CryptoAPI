@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Данные о криптовалюте</title>
+    <title>Crypto Market</title>
     <style>
         body { font-family: Arial, sans-serif; }
         table { width: 50%; margin: 20px auto; border-collapse: collapse; }
@@ -12,10 +12,15 @@
     </style>
 </head>
 <body>
-    <h1 style="text-align:center;">Данные о криптовалюте {{.Name}}</h1>
+    <h1 style="text-align:center;">Crypto Market</h1>
     <table>
-        <tr><th>Поле</th><th>Значение</th></tr>
-        <tr><td>Цена (USD)</td><td>{{.PriceUsd}}</td></tr>
+        <tr><th>Name</th><th>Price (USD)</th></tr>
+        {{range .}}
+        <tr>
+            <td>{{.Name}}</td>
+            <td>$ {{.PriceUsd}}</td>
+        </tr>
+        {{end}}
     </table>
 </body>
 </html>

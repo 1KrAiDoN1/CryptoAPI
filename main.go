@@ -15,19 +15,37 @@ import (
 
 func main() {
 
-	client := &http.Client{}
-	r, err := client.Get("https://api.coincap.io/v2/assets/")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer r.Body.Close()
-	if r.StatusCode != http.StatusOK {
-		log.Fatal(r.Status)
-	}
+	// client := &http.Client{}
+	// r, err := client.Get("https://api.coincap.io/v2/assets/")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer r.Body.Close()
+	// if r.StatusCode != http.StatusOK {
+	// 	log.Fatal(r.Status)
+	// }
 	// body, err := io.ReadAll(r.Body)
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
+
+	// var spisok SliceCrypto
+	// // spisok := make([]string, 0)
+	// // for _, v := range body {
+	// // 	spisok = append(spisok, v)
+	// // }
+	// // fmt.Println(spisok)
+	// err = json.Unmarshal(body, &spisok)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// //fmt.Println(spisok)
+	// var partOfMarket []string
+	// for _, value := range spisok.Crypto {
+	// 	partOfMarket = append(partOfMarket, value.ID)
+	// }
+	// fmt.Println(partOfMarket)
+
 	// fmt.Println(string(body))
 
 	coincapClient, err := coincap.NewClient(time.Second * 10)
@@ -64,7 +82,8 @@ func showInfo(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Ошибка при получении данных", err, http.StatusInternalServerError)
 		return
 	}
-	fmt.Printf("Данные для шаблона: %+v\n", output)
+
+	//fmt.Printf("Данные для шаблона: %+v\n", output)
 	// Используем ParseFiles для загрузки шаблона из файла
 	tmpl, err := template.ParseFiles("home.html")
 	if err != nil {
@@ -80,36 +99,66 @@ func showInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetURL() string {
-	return "https://api.coincap.io/v2/assets/xrp"
+func getCryptoData() ([]CoinStruct, error) {
+	var CryptoBase []CoinStruct
+	for _, id := range SliceOfNameCrypto {
+		clientUser := &http.Client{}
+		response, err := clientUser.Get(fmt.Sprintf("https://api.coincap.io/v2/assets/%s", id))
+		if err != nil {
+			return []CoinStruct{}, err
+		}
+		defer response.Body.Close()
+
+		bodyResponse, err := io.ReadAll(response.Body)
+		if err != nil {
+			return []CoinStruct{}, err
+		}
+
+		var result CoinsStruct
+		err = json.Unmarshal(bodyResponse, &result)
+		if err != nil {
+			return []CoinStruct{}, err
+		}
+		CryptoBase = append(CryptoBase, result.Coin)
+
+	}
+	return CryptoBase, nil
 }
 
-// func (d CoinStruct) PostInfoCrypto(w http.ResponseWriter, r *http.Request) {
+var SliceOfNameCrypto = getSliceOfNameCrypto()
 
-// }
-
-func getCryptoData() (CoinStruct, error) {
-	clientUser := &http.Client{}
-	response, err := clientUser.Get(GetURL())
+func getSliceOfNameCrypto() []string {
+	client := &http.Client{}
+	r, err := client.Get("https://api.coincap.io/v2/assets/")
 	if err != nil {
-		return CoinStruct{}, err
+		log.Fatal(err)
 	}
-	defer response.Body.Close()
-
-	bodyResponse, err := io.ReadAll(response.Body)
-	if err != nil {
-		return CoinStruct{}, err
+	defer r.Body.Close()
+	if r.StatusCode != http.StatusOK {
+		log.Fatal(r.Status)
 	}
-
-	var result CoinsStruct
-	err = json.Unmarshal(bodyResponse, &result)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		return CoinStruct{}, err
+		log.Fatal(err)
 	}
 
-	return result.Coin, nil
+	var spisok SliceCrypto
+	err = json.Unmarshal(body, &spisok)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var partOfMarket []string
+	for _, value := range spisok.Crypto {
+		partOfMarket = append(partOfMarket, value.ID)
+	}
+	return partOfMarket
 }
 
+type SliceCrypto struct {
+	Crypto []CoinStruct `json:"data"`
+	Timet1 int64        `json:"timestamp"`
+}
 type CoinsStruct struct {
 	Coin  CoinStruct `json:"data"`
 	Timet int64      `json:"timestamp"`
