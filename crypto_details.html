@@ -24,39 +24,112 @@
             width: 100%;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: fadeInDown 0.8s ease-out;
         }
         h1 {
             margin: 0;
+            font-size: 2.5rem;
         }
         .details {
             width: 90%;
+            max-width: 600px;
             margin: 20px auto;
             padding: 20px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 40px;
             text-align: center;
+            animation: fadeInUp 0.8s ease-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .details:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
         .details p {
-            margin: 10px 0;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            color: #555;
+        }
+        .details p strong {
+            color: #007bff;
         }
         footer {
             margin-top: auto;
-            padding: 10px;
+            padding: 15px;
             background-color: #007bff;
             color: white;
             width: 100%;
             text-align: center;
+            font-size: 0.9rem;
+            animation: fadeInUp 0.8s ease-out;
         }
         .back-button {
             display: inline-block;
             margin-top: 20px;
-            padding: 10px 20px;
+            padding: 12px 24px;
             background-color: #007bff;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #005bb5;
+            transform: scale(1.05);
+        }
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #007bff, #00b4d8);
+            z-index: -1;
+            opacity: 0.1;
+            animation: floating 10s infinite alternate;
+        }
+        @keyframes floating {
+            0% {
+                transform: translate(0, 0);
+            }
+            50% {
+                transform: translate(10px, 10px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
         }
     </style>
 </head>
@@ -70,7 +143,7 @@
             <p><strong>Symbol:</strong> {{.Symbol}}</p>
             <p><strong>Price (USD):</strong> ${{.PriceUsd | formatLargeNumber}}</p>
             <p><strong>Market Cap (USD):</strong> ${{.MarketCapUsd | formatLargeNumber}}</p>
-            <p><strong>24h Volume (USD):</strong> ${{.VolumeUsd24Hr | formatLargeNumber}}</p>
+            <p><strong>Trading Volume 24h (USD):</strong> ${{.VolumeUsd24Hr | formatLargeNumber}}</p>
             <p><strong>Change (24h):</strong> {{.ChangePercent24Hr | formatLargeNumberForPercent}}%</p>
             <a href="/home" class="back-button">Назад</a>
         </div>
