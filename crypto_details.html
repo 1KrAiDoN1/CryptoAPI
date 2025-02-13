@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Market</title>
+    <title>{{.Name}} Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -15,6 +15,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
         header {
             background-color: #007bff;
@@ -27,33 +28,18 @@
         h1 {
             margin: 0;
         }
-        table {
+        .details {
             width: 90%;
             margin: 20px auto;
-            border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             background-color: white;
-            transition: transform 0.2s;
-        }
-        table:hover {
-            transform: scale(1.02);
-        }
-        th, td {
-            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
         }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
+        .details p {
+            margin: 10px 0;
         }
         footer {
             margin-top: auto;
@@ -63,38 +49,34 @@
             width: 100%;
             text-align: center;
         }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Crypto Market</h1>
+        <h1>{{.Name}} Details</h1>
     </header>
     <main>
-        <table>
-            <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Price (USD)</th>
-                <th>Market Cap (USD)</th>
-                <th>Trading Volume (24h)</th>
-                <th>Change (24h)</th>
-            </tr>
-            {{range .}}
-            <tr>
-                <td>{{.Rank}}</td>
-                <td><a href="/crypto/{{.ID}}">{{.Name}}</a></td>
-                <td>${{.PriceUsd | formatLargeNumber}}</td>
-                <td>${{.MarketCapUsd | formatLargeNumber}}</td>
-                <td>${{.VolumeUsd24Hr | formatLargeNumber}}</td>
-                <td>{{.ChangePercent24Hr | formatLargeNumberForPercent}}%</td>
-
-            </tr>
-            {{end}}
-        </table>
+        <div class="details">
+            <p><strong>Rank:</strong> {{.Rank}}</p>
+            <p><strong>Symbol:</strong> {{.Symbol}}</p>
+            <p><strong>Price (USD):</strong> ${{.PriceUsd | formatLargeNumber}}</p>
+            <p><strong>Market Cap (USD):</strong> ${{.MarketCapUsd | formatLargeNumber}}</p>
+            <p><strong>24h Volume (USD):</strong> ${{.VolumeUsd24Hr | formatLargeNumber}}</p>
+            <p><strong>Change (24h):</strong> {{.ChangePercent24Hr | formatLargeNumberForPercent}}%</p>
+            <a href="/home" class="back-button">Назад</a>
+        </div>
     </main>
     <footer>
         <p>© 2025 Crypto Market</p>
     </footer>
 </body>
 </html>
-
