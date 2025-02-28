@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"helloapp/internal/service"
 	"helloapp/pkg/format"
+
+	"helloapp/internal/database"
 	"html/template"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -12,8 +15,22 @@ import (
 func HandleFunc() {
 	http.HandleFunc("/home", showInfo) // Передаем данные о криптовалюте в обработчик
 	http.HandleFunc("/crypto/", showCryptoDetails)
+	http.HandleFunc("/registration", registration_window)
+	http.HandleFunc("/sendUserRegistrationData", database.SendUserRegistrationData)
 	fmt.Println("Сервер запущен")
 	http.ListenAndServe(":8080", nil)
+
+}
+func registration_window(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("../pkg/templates/registration.html")
+	if err != nil {
+		log.Print("Ошибка при чтении шаблона:", err)
+	}
+	err = tmpl.Execute(w, nil)
+	if err != nil {
+		log.Print("Ошибка при выполнении шаблона:", err)
+	}
+
 }
 
 func showInfo(w http.ResponseWriter, r *http.Request) {
