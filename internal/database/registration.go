@@ -52,7 +52,7 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		log.Printf("Пользователь с почтой %s зарегистрирован", email)
-		// log.Printf("ID пользователя с почтой %s в базе данных: %d", email, GetUserIdFromDB(email, Password))
+		log.Printf("ID пользователя с почтой %s в базе данных: %d", email, GetUserIdFromDB(email, Password))
 
 	}
 
