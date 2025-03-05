@@ -27,6 +27,39 @@
         h1 {
             margin: 0;
         }
+        .login-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .login-button:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: white;
+            color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .logout-button:hover {
+            background-color: #0056b3;
+            color: white;
+        }
         table {
             width: 90%;
             margin: 20px auto;
@@ -39,6 +72,13 @@
         }
         table:hover {
             transform: scale(1.02);
+        }
+        .user-email {
+            position: absolute;
+            top: 20px;
+            right: 150px; /* Отступ от кнопки Sign In */
+            color: white;
+            font-weight: bold;
         }
         th, td {
             padding: 15px;
@@ -68,6 +108,14 @@
 <body>
     <header>
         <h1>Crypto Market</h1>
+        {{if .Email}}
+        <div class="user-email">{{.Email}}</div>
+        {{end}}
+        {{if not .Email}}
+        <a href="/sign_in" class="login-button">Sign In</a>
+        {{else}}
+        <a href="/logout" class="logout-button">Logout</a>
+        {{end}}
     </header>
     <main>
         <table>
@@ -79,7 +127,7 @@
                 <th>Trading Volume (24h)</th>
                 <th>Change (24h)</th>
             </tr>
-            {{range .}}
+            {{range .Output}}
             <tr>
                 <td>{{.Rank}}</td>
                 <td><a href="/crypto/{{.ID}}">{{.Name}}</a></td>
