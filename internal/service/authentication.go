@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -17,7 +18,8 @@ import (
 )
 
 const (
-	TokenTTL = 24 * time.Hour
+	TokenTTL        = 30 * time.Second
+	RefreshTokenTTL = 30 * 24 * time.Hour
 )
 
 func GenerateJWToken(email string, password string) (string, error) {
@@ -34,6 +36,30 @@ func GenerateJWToken(email string, password string) (string, error) {
 	return token.SignedString([]byte(secretSignInKey))
 }
 
+func GetTokens(email string, password string) (string, string, error) {
+	JWToken, err := GenerateJWToken(email, password)
+	if err != nil {
+		return "", "", err
+	}
+	RefreshToken, err := GenerateRefreshToken()
+	if err != nil {
+		return "", "", err
+	}
+	return JWToken, RefreshToken, nil
+}
+
+func GenerateRefreshToken() (string, error) {
+	refresh_token := make([]byte, 32)
+	s := rand.NewSource(time.Now().Unix())
+	r := rand.New(s)
+	if _, err := r.Read(refresh_token); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%x", refresh_token), nil
+
+}
+
 func ParseToken(access_token string) (int, error) {
 	token, err := jwt.ParseWithClaims(access_token, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -44,18 +70,18 @@ func ParseToken(access_token string) (int, error) {
 		// и функцию, которая возвращает секретный ключ для проверки подписи токена.
 	})
 	if err != nil {
-		return 0, err
-	}
-	if !token.Valid {
-		return 0, errors.New("invalid token")
+		return 0, fmt.Errorf("token parse error: %w", err)
 	}
 
-	claims, ok := token.Claims.(*jwt.StandardClaims)
-	if !ok {
-		return 0, errors.New("unexpected signing method")
+	if claims, ok := token.Claims.(*jwt.StandardClaims); ok && token.Valid {
+		userID, err := strconv.Atoi(claims.Id)
+		if err != nil {
+			return 0, fmt.Errorf("invalid user ID in token")
+		}
+		return userID, nil
 	}
-	UserID, _ := strconv.Atoi(claims.Id)
-	return UserID, nil
+
+	return 0, errors.New("invalid token")
 }
 
 func GetUserIdFromDB(email string, password string) int {

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"fmt"
 	"helloapp/internal/database"
 	"helloapp/internal/models"
@@ -8,17 +9,20 @@ import (
 	"helloapp/pkg/format"
 	"html/template"
 	"log"
-	"time"
-
 	"net/http"
 	"strings"
+	"time"
+
+	//"database/sql"
+
+	"github.com/jackc/pgx/v4"
 )
 
 func HandleFunc() {
 	http.HandleFunc("/home", service.RequireAuth(showInfo)) // Передаем данные о криптовалюте в обработчик
 	http.HandleFunc("/crypto/", service.RequireAuth(showCryptoDetails))
 	http.HandleFunc("/sign_up", registration_window)
-	http.HandleFunc("/sign_in", authorization_window)
+	http.HandleFunc("/login", authorization_window)
 	http.HandleFunc("/verification", Verification_User)
 	http.HandleFunc("/sendUserRegistrationData", database.SendUserRegistrationData)
 	http.HandleFunc("/logout", logout)
@@ -28,14 +32,46 @@ func HandleFunc() {
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
+	// refreshCookie, err := r.Cookie("refresh_token")
+	// if err != nil {
+	// 	http.Redirect(w, r, "home", http.StatusSeeOther)
+	// 	return
+	// }
+
+	// // Удаляем refresh токен из базы данных
+	// ctx := context.Background()
+	// connStr := "postgres://postgres:admin@localhost:5432/registration"
+	// db, err := pgx.Connect(ctx, connStr)
+	// if err != nil {
+	// 	http.Error(w, "Database connection error", http.StatusInternalServerError)
+	// 	return
+	// }
+	// defer db.Close(ctx)
+
+	// _, err = db.Exec(ctx, "DELETE FROM refresh_tokens WHERE token = $1", refreshCookie.Value)
+	// if err != nil {
+	// 	http.Error(w, "Failed to delete refresh token", http.StatusInternalServerError)
+	// 	return
+	// }
 	http.SetCookie(w, &http.Cookie{
 		Name:     "jwt_token",
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour),
 		HttpOnly: true,
+		//Secure:   true,
 		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
 	})
-	http.Redirect(w, r, "/sign_in", http.StatusSeeOther)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HttpOnly: true,
+		//Secure:   true,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+	})
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 func registration_window(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("../pkg/templates/registration.html")
@@ -60,8 +96,35 @@ func authorization_window(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// func RefreshHandler(w http.ResponseWriter, r *http.Request) {
+// 	refreshToken, err := r.Cookie("refresh_token")
+// 	if err != nil {
+// 		http.Error(w, "Refresh token required", http.StatusBadRequest)
+// 		return
+// 	}
+
+// 	newJWToken, err := CheckRefreshTokenTTL(refreshToken.Value)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusUnauthorized)
+// 		return
+// 	}
+
+// 	// Обновляем JWT в куках
+// 	http.SetCookie(w, &http.Cookie{
+// 		Name:     "jwt_token",
+// 		Value:    newJWToken,
+// 		Expires:  time.Now().Add(service.TokenTTL),
+// 		HttpOnly: true,
+// 		Path:     "/",
+// 	})
+
+// 	w.WriteHeader(http.StatusOK)
+// 	http.Redirect(w, r, "/home", http.StatusSeeOther)
+// }
+
+// ПРИ АВТОРИЗАЦИИ ВЫДАЕМ ПОЛЬЗОВАТЕЛЮ ДВА ТОКЕНА (JWT и REFRESH)
+// УСТАНАВЛИВАЕМ ТОКЕНЫ В КУКИ
 func Verification_User(w http.ResponseWriter, r *http.Request) {
-	// после того, как пользователь вошел в систему, устанавливаем cookie с jwt токеном
 	if r.Method == "POST" {
 		var user service.SignInUser
 		user.Email = r.FormValue("email")
@@ -69,23 +132,60 @@ func Verification_User(w http.ResponseWriter, r *http.Request) {
 
 		userID := service.GetUserIdFromDB(user.Email, user.Password)
 		if userID == 0 {
-			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			http.Error(w, "Invalid credentials", http.StatusBadRequest)
 			return
 		}
 
-		token, err := service.GenerateJWToken(user.Email, user.Password)
+		//token, err := service.GenerateJWToken(user.Email, user.Password)
+		// if err != nil {
+		// 	http.Error(w, "Error generating token", http.StatusInternalServerError)
+		// 	return
+		// }
+		JWToken, RefreshToken, err := service.GetTokens(user.Email, user.Password) // генерируем два токена
 		if err != nil {
 			http.Error(w, "Error generating token", http.StatusInternalServerError)
 			return
 		}
+		ctx := context.Background()
+		connStr := "postgres://postgres:admin@localhost:5432/registration"
+		db, err := pgx.Connect(ctx, connStr)
+		if err != nil {
+			log.Fatalf("ошибка при коннекте к базе данных: %v\n", err)
+		}
+		defer db.Close(ctx)
 
-		// Устанавливаем токен в куки
+		err = db.Ping(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		RefreshTokenExpiresAt := time.Now().Add(service.RefreshTokenTTL)
+		query := `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`
+		_, err = db.Exec(ctx, query, userID, RefreshToken, RefreshTokenExpiresAt)
+		if err != nil {
+			log.Printf("Ошибка вставки данных: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Устанавливаем JWToken в куки
 		http.SetCookie(w, &http.Cookie{
 			Name:     "jwt_token",
-			Value:    token,
+			Value:    JWToken,
 			Expires:  time.Now().Add(service.TokenTTL),
 			HttpOnly: true,
+			//Secure:   true,
 			Path:     "/",
+			SameSite: http.SameSiteLaxMode,
+		})
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    RefreshToken,
+			Expires:  time.Now().Add(service.RefreshTokenTTL),
+			HttpOnly: true,
+			//Secure:   true,
+			Path:     "/",
+			SameSite: http.SameSiteLaxMode,
 		})
 
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
@@ -112,6 +212,7 @@ func showInfo(w http.ResponseWriter, r *http.Request) {
 		userID, ok = userIDVal.(int)
 		if !ok {
 			fmt.Println("Ошибка: userID в контексте имеет неверный тип")
+			fmt.Println(userIDVal)
 		}
 	}
 	var Email string
@@ -149,9 +250,8 @@ func showCryptoDetails(w http.ResponseWriter, r *http.Request) {
 	userIDVal := r.Context().Value("userID")
 	// var userID int
 	if userIDVal == nil || userIDVal == 0 {
-		http.Redirect(w, r, "/sign_in", http.StatusSeeOther)
-	} else {
-		fmt.Println("Ошибка: userID в контексте имеет неверный тип")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
 	}
 	//userID := r.Context().Value("userID").(int)
 	// if userID == 0 {
