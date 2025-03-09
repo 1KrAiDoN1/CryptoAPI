@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"fmt"
-	"helloapp/internal/database"
 	"helloapp/internal/models"
 	"helloapp/internal/service"
 	"helloapp/pkg/format"
@@ -24,9 +23,9 @@ func HandleFunc() {
 	http.HandleFunc("/sign_up", registration_window)
 	http.HandleFunc("/login", authorization_window)
 	http.HandleFunc("/verification", Verification_User)
-	http.HandleFunc("/sendUserRegistrationData", database.SendUserRegistrationData)
+	http.HandleFunc("/sendUserRegistrationData", service.SendUserRegistrationData)
 	http.HandleFunc("/logout", logout)
-	fmt.Println("Сервер запущен")
+	log.Println("Сервер запущен")
 	http.ListenAndServe(":8080", nil)
 
 }
