@@ -19,7 +19,7 @@ import (
 // Синтаксис функции: strings.TrimPrefix(s, prefix), где s — строка, из которой нужно удалить префикс, а prefix — префикс, который нужно удалить.
 
 func GetCryptoDataByID(id string) (models.CoinStruct, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 150*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://api.coincap.io/v2/assets/%s", id), nil)
 	if err != nil {
