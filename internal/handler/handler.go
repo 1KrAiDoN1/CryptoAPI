@@ -14,10 +14,12 @@ import (
 
 	//"database/sql"
 
+	//"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
 )
 
 func HandleFunc() {
+
 	http.HandleFunc("/home", service.RequireAuth(showInfo)) // Передаем данные о криптовалюте в обработчик
 	http.HandleFunc("/crypto/", service.RequireAuth(showCryptoDetails))
 	http.HandleFunc("/sign_up", registration_window)
@@ -31,27 +33,15 @@ func HandleFunc() {
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
-	// refreshCookie, err := r.Cookie("refresh_token")
-	// if err != nil {
-	// 	http.Redirect(w, r, "home", http.StatusSeeOther)
-	// 	return
-	// }
-
-	// // Удаляем refresh токен из базы данных
-	// ctx := context.Background()
-	// connStr := "postgres://postgres:admin@localhost:5432/registration"
-	// db, err := pgx.Connect(ctx, connStr)
-	// if err != nil {
-	// 	http.Error(w, "Database connection error", http.StatusInternalServerError)
-	// 	return
-	// }
-	// defer db.Close(ctx)
-
-	// _, err = db.Exec(ctx, "DELETE FROM refresh_tokens WHERE token = $1", refreshCookie.Value)
-	// if err != nil {
-	// 	http.Error(w, "Failed to delete refresh token", http.StatusInternalServerError)
-	// 	return
-	// }
+	refresh_token, _ := r.Cookie("refresh_token")
+	if refresh_token != nil {
+		userID, _ := service.Get_UserID_By_Refresh_Token(refresh_token.Value)
+		service.Remove_The_Old_Refresh_Token(userID)
+	} else {
+		log.Println("userID == 0")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	http.SetCookie(w, &http.Cookie{
 		Name:     "jwt_token",
 		Value:    "",
@@ -95,32 +85,6 @@ func authorization_window(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func RefreshHandler(w http.ResponseWriter, r *http.Request) {
-// 	refreshToken, err := r.Cookie("refresh_token")
-// 	if err != nil {
-// 		http.Error(w, "Refresh token required", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	newJWToken, err := CheckRefreshTokenTTL(refreshToken.Value)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusUnauthorized)
-// 		return
-// 	}
-
-// 	// Обновляем JWT в куках
-// 	http.SetCookie(w, &http.Cookie{
-// 		Name:     "jwt_token",
-// 		Value:    newJWToken,
-// 		Expires:  time.Now().Add(service.TokenTTL),
-// 		HttpOnly: true,
-// 		Path:     "/",
-// 	})
-
-// 	w.WriteHeader(http.StatusOK)
-// 	http.Redirect(w, r, "/home", http.StatusSeeOther)
-// }
-
 // ПРИ АВТОРИЗАЦИИ ВЫДАЕМ ПОЛЬЗОВАТЕЛЮ ДВА ТОКЕНА (JWT и REFRESH)
 // УСТАНАВЛИВАЕМ ТОКЕНЫ В КУКИ
 func Verification_User(w http.ResponseWriter, r *http.Request) {
@@ -131,15 +95,10 @@ func Verification_User(w http.ResponseWriter, r *http.Request) {
 
 		userID := service.GetUserIdFromDB(user.Email, user.Password)
 		if userID == 0 {
-			http.Error(w, "Invalid credentials", http.StatusBadRequest)
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return
 		}
 
-		//token, err := service.GenerateJWToken(user.Email, user.Password)
-		// if err != nil {
-		// 	http.Error(w, "Error generating token", http.StatusInternalServerError)
-		// 	return
-		// }
 		JWToken, RefreshToken, err := service.GetTokens(user.Email, user.Password) // генерируем два токена
 		if err != nil {
 			http.Error(w, "Error generating token", http.StatusInternalServerError)
