@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	TokenTTL        = 20 * time.Second
-	RefreshTokenTTL = 40 * time.Second
+	TokenTTL        = 3 * time.Minute
+	RefreshTokenTTL = 3 * time.Hour
 )
 
 func GenerateJWToken(email string, password string) (string, error) {

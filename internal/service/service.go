@@ -51,58 +51,60 @@ func GetCryptoDataByID(id string) (models.CoinStruct, error) {
 	return result.Coin, nil
 }
 
+// func GetCryptoData() ([]models.CoinStruct, error) {
+// 	var CryptoBase []models.CoinStruct
+// 	for _, id := range SliceOfNameCrypto[:5] {
+// 		clientUser := &http.Client{}
+// 		response, err := clientUser.Get(fmt.Sprintf("https://api.coincap.io/v2/assets/%s", id))
+// 		if err != nil {
+// 			return []models.CoinStruct{}, err
+// 		}
+// 		defer response.Body.Close()
+
+// 		bodyResponse, err := io.ReadAll(response.Body)
+// 		if err != nil {
+// 			return []models.CoinStruct{}, err
+// 		}
+
+// 		var result models.CoinsStruct
+// 		err = json.Unmarshal(bodyResponse, &result)
+// 		if err != nil {
+// 			return []models.CoinStruct{}, err
+// 		}
+// 		CryptoBase = append(CryptoBase, result.Coin)
+
+// 	}
+// 	return CryptoBase, nil
+
+// }
+
+// var SliceOfNameCrypto = GetSliceOfNameCrypto()
+
 func GetCryptoData() ([]models.CoinStruct, error) {
-	var CryptoBase []models.CoinStruct
-	for _, id := range SliceOfNameCrypto[:15] {
-		clientUser := &http.Client{}
-		response, err := clientUser.Get(fmt.Sprintf("https://api.coincap.io/v2/assets/%s", id))
-		if err != nil {
-			return []models.CoinStruct{}, err
-		}
-		defer response.Body.Close()
-
-		bodyResponse, err := io.ReadAll(response.Body)
-		if err != nil {
-			return []models.CoinStruct{}, err
-		}
-
-		var result models.CoinsStruct
-		err = json.Unmarshal(bodyResponse, &result)
-		if err != nil {
-			return []models.CoinStruct{}, err
-		}
-		CryptoBase = append(CryptoBase, result.Coin)
-
-	}
-	return CryptoBase, nil
-}
-
-var SliceOfNameCrypto = GetSliceOfNameCrypto()
-
-func GetSliceOfNameCrypto() []string {
 	client := &http.Client{}
 	r, err := client.Get("https://api.coincap.io/v2/assets/")
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Ошибка при запросе данных о криптовалютах:", err)
+		return []models.CoinStruct{}, err
 	}
 	defer r.Body.Close()
 	if r.StatusCode != http.StatusOK {
-		log.Fatal(r.Status)
+		log.Println("Ошибка при запросе данных о криптовалютах:", err)
+		return []models.CoinStruct{}, err
+
 	}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Ошибка при чтении данных о криптовалютах:", err)
+		return []models.CoinStruct{}, err
 	}
 
 	var spisok models.SliceCrypto
 	err = json.Unmarshal(body, &spisok)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Ошибка при десереализации данных о криптовалютах:", err)
+		return []models.CoinStruct{}, err
 	}
 
-	var partOfMarket []string
-	for _, value := range spisok.Crypto {
-		partOfMarket = append(partOfMarket, value.ID)
-	}
-	return partOfMarket
+	return spisok.Crypto, nil
 }

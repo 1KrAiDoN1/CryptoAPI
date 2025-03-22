@@ -62,6 +62,7 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 			}
 
 		} else {
+			// http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		}
 
