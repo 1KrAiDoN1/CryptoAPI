@@ -22,13 +22,35 @@ func HandleFunc() {
 
 	http.HandleFunc("/home", service.RequireAuth(showInfo)) // Передаем данные о криптовалюте в обработчик
 	http.HandleFunc("/crypto/", service.RequireAuth(showCryptoDetails))
+	http.HandleFunc("/personal_account", service.RequireAuth(showPersonalAccount))
 	http.HandleFunc("/sign_up", registration_window)
 	http.HandleFunc("/login", authorization_window)
 	http.HandleFunc("/verification", Verification_User)
+	http.HandleFunc("/saveFavoriteCrypto/", service.RequireAuth(saveFavoriteCrypto))
 	http.HandleFunc("/sendUserRegistrationData", service.SendUserRegistrationData)
 	http.HandleFunc("/logout", logout)
 	log.Println("Сервер запущен")
 	http.ListenAndServe(":8080", nil)
+
+}
+
+func saveFavoriteCrypto(w http.ResponseWriter, r *http.Request) {
+	userIDVal := r.Context().Value("userID").(int)
+	if userIDVal == 0 {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	// Извлекаем ID криптовалюты из URL
+	crypto_name := strings.TrimPrefix(r.URL.Path, "/saveFavoriteCrypto/")
+	if crypto_name == "" {
+		http.Error(w, "ID криптовалюты не указан", http.StatusBadRequest)
+		return
+	}
+	err := service.AddFavoriteCryptoDB(userIDVal, crypto_name)
+	if err != nil {
+		log.Println("Ошибка при добавлении в избранное:", err)
+	}
+	http.Redirect(w, r, "/personal_account", http.StatusSeeOther)
 
 }
 
@@ -62,6 +84,57 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	})
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
+
+type DataUser struct {
+	Email              string
+	TimeOfRegistration time.Time
+	FavoriteCrypto     []models.CoinStruct
+}
+
+func showPersonalAccount(w http.ResponseWriter, r *http.Request) {
+
+	userID := r.Context().Value("userID").(int)
+	email, err := service.GetUserEmailFromDB(userID)
+	if err != nil {
+		log.Println("Ошибка при получении почты пользователя", err)
+	}
+	timeOfRegistration, err := service.GetTimeOfRegistrationFromDB(userID)
+	if err != nil {
+		log.Println("Ошибка при получении времени регистрации пользователя", err)
+	}
+	done := make(chan struct{})
+	var favoriteCrypto []models.CoinStruct
+	var loadErr error
+	go func() {
+		defer close(done)
+		favoriteCrypto, loadErr = service.GetFavoriteCoins(userID)
+	}()
+
+	// Ожидание завершения с таймаутом
+	select {
+	case <-done:
+		// Продолжаем выполнение
+	case <-time.After(5 * time.Second):
+		log.Println("Таймаут загрузки данных")
+		http.Error(w, "Превышено время загрузки данных", http.StatusGatewayTimeout)
+		return
+	}
+
+	if loadErr != nil {
+		log.Printf("Ошибка загрузки данных: %v", loadErr)
+		// Можно показать частичные данные
+	}
+	data := DataUser{Email: email, TimeOfRegistration: timeOfRegistration, FavoriteCrypto: favoriteCrypto}
+	tmpl, err := template.New("personal_account.html").Funcs(template.FuncMap{"formatLargeNumber": format.FormatLargeNumber, "formatLargeNumberForPercent": format.FormatLargeNumberForPercent, "Float": format.Float}).ParseFiles("../pkg/templates/personal_account.html")
+	if err != nil {
+		log.Println("Ошибка при чтении шаблона", err)
+	}
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		log.Print("Ошибка при выполнении шаблона:", err)
+	}
+}
+
 func registration_window(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("../pkg/templates/registration.html")
 	if err != nil {
