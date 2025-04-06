@@ -1,9 +1,7 @@
 package service
 
 import (
-	"context"
 	"crypto/sha1"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -13,13 +11,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
 )
 
 const (
-	TokenTTL        = 3 * time.Minute
-	RefreshTokenTTL = 3 * time.Hour
+	TokenTTL        = 24 * time.Hour
+	RefreshTokenTTL = 30 * 24 * time.Hour
 )
 
 func GenerateJWToken(email string, password string) (string, error) {
@@ -82,52 +79,6 @@ func ParseToken(access_token string) (int, error) {
 	}
 
 	return 0, errors.New("invalid token")
-}
-
-func GetUserIdFromDB(email string, password string) int {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	// подключение к базе данных
-	db, err := pgx.Connect(ctx, connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close(ctx)
-
-	// Проверка подключения
-	err = db.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var UserId int
-	query := "SELECT id FROM users WHERE email = $1 AND password = $2"
-	err = db.QueryRow(ctx, query, email, HashToken(password)).Scan(&UserId)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return 0
-		}
-		return 0
-	}
-	return UserId
-
-}
-
-func GetUserEmailFromDB(userID int) (string, error) {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
-	if err != nil {
-		return "", err
-	}
-	defer db.Close(ctx)
-
-	var email string
-	query := "SELECT email FROM users WHERE id = $1"
-	err = db.QueryRow(ctx, query, userID).Scan(&email)
-	if err != nil {
-		return "", err
-	}
-	return email, nil
 }
 
 func HashToken(Password string) string {
