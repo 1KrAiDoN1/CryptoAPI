@@ -7,173 +7,141 @@
     <meta name="keywords" content="вход, sign in, логин, авторизация">
     <meta name="author" content="Ваше имя">
     <title>Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+        :root {
+            --primary-color: #6C63FF;
+            --background-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #ffffff;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
             min-height: 100vh;
+            background: var(--background-gradient);
+            color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            font-family: Arial, sans-serif;
+            padding: 2rem;
         }
 
-        /* Контейнер формы */
         .container {
-            max-width: 350px;
-            background: #F8F9FD;
-            background: linear-gradient(0deg, rgb(255, 255, 255) 0%, rgb(244, 247, 251) 100%);
-            border-radius: 40px;
-            padding: 25px 35px;
-            border: 5px solid rgb(255, 255, 255);
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 30px 30px -20px;
-            margin: 20px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 400px;
+            animation: fadeInUp 0.6s forwards;
+            opacity: 0;
         }
 
-        /* Заголовок */
         .heading {
             text-align: center;
-            font-weight: 900;
-            font-size: 30px;
-            color: rgb(16, 137, 211);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary-color), #00bfa6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Форма */
         .form {
-            margin-top: 20px;
-        }
-
-        /* Поля ввода */
-        .form .input {
-            width: 90%;
-            background: white;
-            border: none;
-            padding: 15px 15px;
-            border-radius: 20px;
-            margin-top: 15px;
-            box-shadow: #cff0ff 0px 10px 10px 0px;
-            border-inline: 2px solid transparent;
-        }
-
-        .form .input::placeholder {
-            color: rgb(170, 170, 170);
-        }
-
-        .form .input:focus {
-            outline: none;
-            border-inline: 2px solid #12B1D1;
-        }
-
-        /* Ссылка "Забыли пароль?" */
-        .form .forgot-password {
-            display: block;
-            margin-top: 10px;
-            margin-left: 10px;
-        }
-
-        .form .forgot-password a {
-            font-size: 11px;
-            color: #0099ff;
-            text-decoration: none;
-        }
-
-        /* Кнопка входа */
-        .form .login-button {
-            display: block;
-            width: 100%;
-            font-weight: bold;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            padding-block: 15px;
-            margin: 20px auto;
-            border-radius: 20px;
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 20px 10px -15px;
-            border: none;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .form .login-button:hover {
-            transform: scale(1.03);
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 23px 10px -20px;
-        }
-
-        .form .login-button:active {
-            transform: scale(0.95);
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 15px 10px -10px;
-        }
-
-        /* Кнопка регистрации */
-        .register-button {
-            display: block;
-            width: 100%;
-            font-weight: bold;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            padding-block: 15px;
-            margin: 20px auto;
-            border-radius: 20px;
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 20px 10px -15px;
-            border: none;
-            transition: all 0.2s ease-in-out;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        .register-button:hover {
-            transform: scale(1.03);
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 23px 10px -20px;
-        }
-
-        .register-button:active {
-            transform: scale(0.95);
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 15px 10px -10px;
-        }
-
-        /* Социальные кнопки */
-        .social-account-container {
-            margin-top: 25px;
-        }
-
-        .social-account-container .title {
-            display: block;
-            text-align: center;
-            font-size: 10px;
-            color: rgb(170, 170, 170);
-        }
-
-        .social-account-container .social-accounts {
-            width: 100%;
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 5px;
+            flex-direction: column;
+            gap: 1.2rem;
         }
 
-        .social-account-container .social-accounts .social-button {
-            background: linear-gradient(45deg, rgb(0, 0, 0) 0%, rgb(112, 112, 112) 100%);
-            border: 5px solid white;
-            padding: 5px;
-            border-radius: 50%;
-            width: 40px;
-            aspect-ratio: 1;
-            display: grid;
-            place-content: center;
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 12px 10px -8px;
-            transition: all 0.2s ease-in-out;
+        .input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s;
         }
 
-        .social-account-container .social-accounts .social-button .svg {
-            fill: white;
-            margin: auto;
+        .input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(108, 99, 255, 0.3);
         }
 
-        .social-account-container .social-accounts .social-button:hover {
-            transform: scale(1.2);
+        .input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
 
-        .social-account-container .social-accounts .social-button:active {
-            transform: scale(0.9);
+        .login-button {
+            background: linear-gradient(45deg, var(--primary-color), #00bfa6);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .links a:hover {
+            color: #00bfa6;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .heading {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
@@ -184,9 +152,11 @@
             <form action="/verification" method="POST" class="form">  
                 <input required class="input" type="email" name="email" id="email" placeholder="E-mail">
                 <input required class="input" type="password" name="password" id="password" placeholder="Password">
-                <span class="forgot-password"><a href="#">Forgot Password?</a></span>
-                <span class="forgot-password"><a href="/sign_up">Not registered yet? Sign up</a></span>
-                <input class="login-button" type="submit" value="Sign In">
+                <div class="links">
+                    <a href="#">Forgot Password?</a>
+                    <a href="/sign_up">Create Account</a>
+                </div>
+                <button type="submit" class="login-button">Sign In</button>
             </form>
         </section>
     </main>

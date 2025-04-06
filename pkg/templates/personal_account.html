@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+        :root {
+            --primary-color: #6b63ff;
+            --background-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background-gradient);
+            color: white;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s forwards;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+        }
+
+        .favorites-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .crypto-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .crypto-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-3px);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary-color), #00bfa6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .info-item {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .info-item i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        .crypto-card {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        }
+
+        .crypto-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .crypto-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .crypto-rank {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .crypto-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .crypto-price {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .crypto-marketcap {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .crypto-change {
+            font-size: 0.95rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            width: fit-content;
+        }
+
+        .crypto-change.positive {
+            color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .crypto-change.negative {
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            opacity: 0.5;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .info-card {
+                padding: 1.5rem;
+            }
+        }
+        
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Personal Account</h1>
+        </div>
+
+        <div class="user-info">
+            <div class="info-card">
+                <h2><i class="fas fa-user"></i> Profile</h2>
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{.Email}}</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Registered at: {{.TimeOfRegistration.Format "02 Jan 2006 в 15:04 MST"}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="favorites-section">
+            <h2><i class="fas fa-star"></i> Favorite Cryptocurrency</h2>
+            <div class="favorites-grid">
+                {{range .FavoriteCrypto}}
+                <div class="crypto-card">
+                    <div class="crypto-header">
+                        <a href="/crypto/{{.ID}}" style="text-decoration: none; color: inherit;">
+                            <h3 class="crypto-name">{{.Name}} ({{.Symbol}})</h3>
+                        </a>
+                        <div class="crypto-rank">Rank #{{.Rank}}</div>
+                    </div>
+                    <div class="crypto-info">
+                        <div class="crypto-price">
+                            <i class="fas fa-dollar-sign"></i>
+                            {{.PriceUsd | formatLargeNumber}}
+                        </div>
+                        <div class="crypto-marketcap">
+                            <i class="fas fa-chart-line"></i>
+                            {{.MarketCapUsd | formatLargeNumber}}
+                        </div>
+                        <div class="crypto-change {{if lt (Float .ChangePercent24Hr) 0.01}}negative{{else}}positive{{end}}">
+                            <i class="fas {{if lt (Float .ChangePercent24Hr) 0.01}}fa-arrow-down{{else}}fa-arrow-up{{end}}"></i>
+                            {{formatLargeNumberForPercent .ChangePercent24Hr}}%
+                        </div>
+                    </div>
+                </div>
+                {{else}}
+                <div class="crypto-card empty-state">
+                    <i class="fas fa-coins"></i>
+                    <p>No favorite cryptocurrencies yet</p>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

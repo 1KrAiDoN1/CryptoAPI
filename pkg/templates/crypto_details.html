@@ -4,82 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Name}} Details</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+        :root {
+            --primary-color: #6C63FF;
+            --background-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #ffffff;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background-gradient);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            padding: 2rem;
         }
+
         header {
-            background-color: #007bff;
-            color: white;
-            padding: 20px;
-            width: 100%;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             animation: fadeInDown 0.8s ease-out;
         }
+
         h1 {
-            margin: 0;
             font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary-color), #00bfa6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
         }
+
         .details {
-            width: 90%;
-            max-width: 600px;
+            width: 100%;
+            max-width: 800px;
             margin: 20px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 40px;
-            text-align: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             animation: fadeInUp 0.8s ease-out;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .details:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
         }
+
         .details p {
-            margin: 15px 0;
+            margin: 1.2rem 0;
             font-size: 1.1rem;
-            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
         }
+
         .details p strong {
-            color: #007bff;
+            color: var(--primary-color);
+            min-width: 180px;
+            text-align: right;
         }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding: 12px 24px;
+            background: rgba(108, 99, 255, 0.2);
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
         footer {
             margin-top: auto;
-            padding: 15px;
-            background-color: #007bff;
-            color: white;
-            width: 100%;
+            padding: 1.5rem;
             text-align: center;
-            font-size: 0.9rem;
-            animation: fadeInUp 0.8s ease-out;
+            background: var(--card-bg);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
-        .back-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-size: 1rem;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
-        .back-button:hover {
-            background-color: #005bb5;
-            transform: scale(1.05);
-        }
+
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -90,6 +123,7 @@
                 transform: translateY(0);
             }
         }
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -100,35 +134,24 @@
                 transform: translateY(0);
             }
         }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
             }
-            to {
-                opacity: 1;
+            
+            .details p {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.3rem;
             }
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #007bff, #00b4d8);
-            z-index: -1;
-            opacity: 0.1;
-            animation: floating 10s infinite alternate;
-        }
-        @keyframes floating {
-            0% {
-                transform: translate(0, 0);
+            
+            .details p strong {
+                text-align: left;
             }
-            50% {
-                transform: translate(10px, 10px);
-            }
-            100% {
-                transform: translate(0, 0);
+            
+            h1 {
+                font-size: 2rem;
             }
         }
     </style>
@@ -137,17 +160,42 @@
     <header>
         <h1>{{.Name}} Details</h1>
     </header>
+    
     <main>
         <div class="details">
-            <p><strong>Rank:</strong> {{.Rank}}</p>
-            <p><strong>Symbol:</strong> {{.Symbol}}</p>
-            <p><strong>Price (USD):</strong> ${{.PriceUsd | formatLargeNumber}}</p>
-            <p><strong>Market Cap (USD):</strong> ${{.MarketCapUsd | formatLargeNumber}}</p>
-            <p><strong>Trading Volume 24h (USD):</strong> ${{.VolumeUsd24Hr | formatLargeNumber}}</p>
-            <p><strong>Change (24h):</strong> {{.ChangePercent24Hr | formatLargeNumberForPercent}}%</p>
-            <a href="/home" class="back-button">Назад</a>
+            <p>
+                <strong><i class="fas fa-hashtag"></i> Rank:</strong> 
+                <span>{{.Rank}}</span>
+            </p>
+            <p>
+                <strong><i class="fas fa-coins"></i> Symbol:</strong> 
+                <span>{{.Symbol}}</span>
+            </p>
+            <p>
+                <strong><i class="fas fa-dollar-sign"></i> Price (USD):</strong> 
+                <span>${{.PriceUsd | formatLargeNumber}}</span>
+            </p>
+            <p>
+                <strong><i class="fas fa-chart-line"></i> Market Cap:</strong> 
+                <span>${{.MarketCapUsd | formatLargeNumber}}</span>
+            </p>
+            <p>
+                <strong><i class="fas fa-chart-bar"></i> Volume (24h):</strong> 
+                <span>${{.VolumeUsd24Hr | formatLargeNumber}}</span>
+            </p>
+            <p>
+                <strong><i class="fas fa-percentage"></i> Change (24h):</strong> 
+                <span>
+                    {{.ChangePercent24Hr | formatLargeNumberForPercent}}%
+                </span>
+            </p>
+            <a href="/home" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Назад
+            </a>
         </div>
     </main>
+
     <footer>
         <p>© 2025 Crypto Market</p>
     </footer>

@@ -4,104 +4,181 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Market</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+        :root {
+            --primary-color: #6C63FF;
+            --background-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #ffffff;
+        }
+        .favorite-link {
+            color: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .favorite-link .fas {
+            color: var(--primary-color);
+        }
+        
+        .favorite-link .far {
+            color: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s;
+        }
+
+        .favorite-link:hover {
+            color: var(--primary-color);
+            transform: scale(1.2);
+            text-decoration: none;
+        }
+
+        .favorite-link i {
+            font-size: 1.2rem;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background-gradient);
+            color: var(--text-color);
+            padding: 2rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
+
         header {
-            background-color: #007bff;
-            color: white;
-            padding: 20px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
+
         h1 {
-            margin: 0;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary-color), #00bfa6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
         }
-        .login-button {
+
+        .login-button, .logout-button, .profile-link {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: white;
-            color: #007bff;
+            top: 50%;
+            transform: translateY(-50%);
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s, color 0.3s;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .login-button:hover {
-            background-color: #0056b3;
-            color: white;
+
+        .login-button {
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
         }
 
         .logout-button {
-            position: absolute;
-            top: 20px;
             left: 20px;
-            background-color: white;
-            color: #007bff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s, color 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
         }
-        .logout-button:hover {
-            background-color: #0056b3;
-            color: white;
+
+        .profile-link {
+            right: 20px;
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--primary-color);
         }
+
+        .login-button:hover, .logout-button:hover {
+            background: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+
         table {
-            width: 90%;
-            margin: 20px auto;
+            width: 100%;
+            margin: 20px 0;
             border-collapse: collapse;
-            border-radius: 8px;
+            background: var(--card-bg);
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background-color: white;
-            transition: transform 0.2s;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.6s forwards;
+            opacity: 0;
         }
-        table:hover {
-            transform: scale(1.005);
-        }
-        .user-email {
-            position: absolute;
-            top: 20px;
-            right: 150px; /* Отступ от кнопки Sign In */
-            color: white;
-            font-weight: bold;
-        }
+
         th, td {
             padding: 15px;
             text-align: center;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         th {
-            background-color: #007bff;
-            color: white;
+            background: rgba(108, 99, 255, 0.2);
+            color: var(--primary-color);
+            font-weight: 600;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+
         tr:hover {
-            background-color: #f1f1f1;
+            background: rgba(255, 255, 255, 0.03);
         }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #00bfa6;
+        }
+
         footer {
             margin-top: auto;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            width: 100%;
+            padding: 1.5rem;
             text-align: center;
+            background: var(--card-bg);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            header {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .profile-link {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -109,7 +186,9 @@
     <header>
         <h1>Crypto Market</h1>
         {{if .Email}}
-        <div class="user-email">{{.Email}}</div>
+        <a href="/personal_account" class="profile-link">
+            <i class="fas fa-user"></i> {{.Email}}
+        </a>
         {{end}}
         {{if not .Email}}
         <a href="/login" class="login-button">Sign In</a>
@@ -117,15 +196,17 @@
         <a href="/logout" class="logout-button">Logout</a>
         {{end}}
     </header>
+    
     <main>
         <table>
             <tr>
                 <th>Rank</th>
                 <th>Name</th>
                 <th>Price (USD)</th>
-                <th>Market Cap (USD)</th>
-                <th>Trading Volume (24h)</th>
+                <th>Market Cap</th>
+                <th>Volume (24h)</th>
                 <th>Change (24h)</th>
+                <th>Add to Favorites</th>
             </tr>
             {{range .Output}}
             <tr>
@@ -135,14 +216,18 @@
                 <td>${{.MarketCapUsd | formatLargeNumber}}</td>
                 <td>${{.VolumeUsd24Hr | formatLargeNumber}}</td>
                 <td>{{.ChangePercent24Hr | formatLargeNumberForPercent}}%</td>
-
+                <td>
+                    <a href="/saveFavoriteCrypto/{{.ID}}" class="favorite-link" title="Добавить в избранное">
+                        <i class="far fa-heart"></i>
+                    </a>
+                </td>
             </tr>
             {{end}}
         </table>
     </main>
+    
     <footer>
         <p>© 2025 Crypto Market</p>
     </footer>
 </body>
 </html>
-
