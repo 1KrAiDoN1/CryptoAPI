@@ -1,0 +1,296 @@
+basePath: /api/v1
+definitions:
+  handler.DataInfo:
+    properties:
+      email:
+        type: string
+      output:
+        items:
+          $ref: '#/definitions/models.CoinStruct'
+        type: array
+    type: object
+  handler.DataUser:
+    properties:
+      email:
+        type: string
+      favoriteCrypto:
+        items:
+          $ref: '#/definitions/models.CoinStruct'
+        type: array
+      timeOfRegistration:
+        type: string
+    type: object
+  models.CoinStruct:
+    properties:
+      changePercent24Hr:
+        type: string
+      id:
+        type: string
+      marketCapUsd:
+        type: string
+      maxSupply:
+        type: string
+      name:
+        type: string
+      priceUsd:
+        type: string
+      rank:
+        type: string
+      supply:
+        type: string
+      symbol:
+        type: string
+      volumeUsd24Hr:
+        type: string
+      vwap24Hr:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: pavelvasilev24843@gmail.com
+    url: https://t.me/KrAiDoN
+  description: API server for Crypto Market
+  title: Crypto Market API
+  version: "1.0"
+paths:
+  /crypto/{id}:
+    get:
+      description: Shows detailed information page for specified cryptocurrency
+      parameters:
+      - description: Cryptocurrency ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: access_token=your_token_here
+        description: Access token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page with cryptocurrency details
+        "302":
+          description: Redirect to login if not authenticated
+        "400":
+          description: Bad Request - Missing cryptocurrency ID
+          schema:
+            type: string
+        "404":
+          description: Not Found - Cryptocurrency not found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get cryptocurrency details
+      tags:
+      - Crypto
+  /home:
+    get:
+      description: Fetches cryptocurrency market data and displays it along with authenticated
+        user's email (if available)
+      parameters:
+      - default: access_token=your_token_here
+        description: Access token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page with crypto data
+          schema:
+            $ref: '#/definitions/handler.DataInfo'
+        "401":
+          description: Unauthorized (though page will still render without user data)
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get cryptocurrency data and user info
+      tags:
+      - Crypto
+  /logout:
+    post:
+      description: Invalidates user session by clearing authentication cookies and
+        removing refresh token
+      parameters:
+      - default: refresh_token=your_token_here
+        description: Refresh token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "303":
+          description: Redirect to login page
+        "401":
+          description: Unauthorized - No valid session
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Logout user
+      tags:
+      - Authentication
+  /personal_account:
+    get:
+      description: Retrieves authenticated user's profile information including email,
+        registration time and favorite cryptocurrencies
+      parameters:
+      - default: access_token=your_token_here
+        description: Access token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page with user data
+          schema:
+            $ref: '#/definitions/handler.DataUser'
+        "401":
+          description: Unauthorized - Missing or invalid token
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+        "504":
+          description: Gateway Timeout - Data loading timeout
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get personal account data
+      tags:
+      - User
+  /register:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates new user account with email and password
+      parameters:
+      - description: User email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: User password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "303":
+          description: Redirect to home page on success
+        "400":
+          description: Bad Request - Missing email or password
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register new user
+      tags:
+      - Authentication
+  /saveFavoriteCrypto/{crypto_name}:
+    post:
+      description: Saves specified cryptocurrency to authenticated user's favorites
+        list
+      parameters:
+      - description: Cryptocurrency ID or symbol
+        in: path
+        name: crypto_name
+        required: true
+        type: string
+      responses:
+        "303":
+          description: Redirect to personal account page
+        "400":
+          description: Bad Request - Missing cryptocurrency ID
+          schema:
+            type: string
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Add favorite cryptocurrency
+      tags:
+      - User
+  /verification:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Verifies user credentials and issues access/refresh tokens
+      parameters:
+      - description: User email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: User password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sets access_token and refresh_token cookies
+          schema:
+            type: object
+        "303":
+          description: Redirect to /home on success
+        "401":
+          description: Unauthorized - Invalid credentials
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: User authentication
+      tags:
+      - Authentication
+securityDefinitions:
+  ApiKeyAuth:
+    description: JWT token in cookie
+    in: cookie
+    name: access_token
+    type: apiKey
+  RefreshToken:
+    description: Refresh token in cookie
+    in: cookie
+    name: refresh_token
+    type: apiKey
+swagger: "2.0"

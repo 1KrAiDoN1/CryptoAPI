@@ -25,7 +25,7 @@ func GenerateJWToken(email string, password string) (string, error) {
 		IssuedAt:  time.Now().Unix(),
 		ExpiresAt: time.Now().Add(TokenTTL).Unix(),
 	})
-	err := godotenv.Load("/Users/pavelvasilev/Desktop/HTTP & SQL with Go/internal/database/secretHash.env")
+	err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/secretHash.env")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +83,7 @@ func ParseToken(access_token string) (int, error) {
 
 func HashToken(Password string) string {
 	hash := sha1.New()
-	err := godotenv.Load("/Users/pavelvasilev/Desktop/HTTP & SQL with Go/internal/database/secretHash.env")
+	err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/secretHash.env")
 	if err != nil {
 		log.Fatal(err)
 	}

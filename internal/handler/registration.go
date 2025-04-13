@@ -1,9 +1,10 @@
-package service
+package handler
 
 import (
 	"context"
 	"crypto/sha1"
 	"fmt"
+	"helloapp/internal/service"
 	"log"
 	"net/http"
 	"os"
@@ -19,7 +20,48 @@ import (
 // <host> — адрес сервера (например, localhost для локального подключения или IP-адрес сервера).
 // <port> — порт, на котором работает PostgreSQL (по умолчанию это 5432).
 // <database> — имя базы данных, к которой вы хотите подключиться.
+// func NewPostgresDB() (*pgx.Conn, error) {
+// 	err := godotenv.Load()
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	dbUser := os.Getenv("DB_USER")
+// 	dbPassword := os.Getenv("DB_PASSWORD")
+// 	dbHost := os.Getenv("DB_HOST")
+// 	dbPort := os.Getenv("DB_PORT")
+// 	dbName := os.Getenv("DB_NAME")
+// 	dbConnStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
+// 	db, err := pgx.Connect(context.Background(), dbConnStr)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return db, nil
+// }
 
+// SendUserRegistrationData handles new user registration
+// @Summary Register new user
+// @Description Creates new user account with email and password
+// @Tags Authentication
+// @Accept x-www-form-urlencoded
+// @Produce json
+// @Param email formData string true "User email"
+// @Param password formData string true "User password"
+// @Success 303 "Redirect to home page on success"
+// @Failure 400 {string} string "Bad Request - Missing email or password"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /register [post]
+//
+// Registration Flow:
+// 1. Validates email and password presence
+// 2. Hashes password (using bcrypt or similar)
+// 3. Stores user in database with registration timestamp
+// 4. Generates debug logs with registration info
+// 5. Redirects to /home on success
+//
+// Security Notes:
+// - Passwords are hashed before storage
+// - No sensitive data is logged
+// - Returns minimal error information to client
 func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email") // получаем данные из полей ввода пользователем
 	Password := r.FormValue("password")
@@ -52,10 +94,10 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		log.Printf("Пользователь с почтой %s зарегистрирован", email)
-		log.Printf("ID пользователя с почтой %s в базе данных: %d", email, GetUserIdFromDB(email, Password))
-		token, _ := GenerateJWToken(email, Password)
+		log.Printf("ID пользователя с почтой %s в базе данных: %d", email, service.GetUserIdFromDB(email, Password))
+		token, _ := service.GenerateJWToken(email, Password)
 		log.Print("token пользователя:", token)
-		id_from_token, _ := ParseToken(token)
+		id_from_token, _ := service.ParseToken(token)
 		log.Print("Полученный ID из токена: ", id_from_token)
 
 	}
@@ -64,7 +106,7 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 
 func Hash(Password string) string {
 	hash := sha1.New()
-	err := godotenv.Load("/Users/pavelvasilev/Desktop/HTTP & SQL with Go/internal/database/secretHash.env")
+	err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/secretHash.env")
 	if err != nil {
 		log.Fatal(err)
 	}

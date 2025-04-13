@@ -1,9 +1,10 @@
-package service
+package handler
 
 import (
 	"context"
 	// "errors"
 	// "fmt"
+	"helloapp/internal/service"
 	"log"
 	"net/http"
 	"time"
@@ -11,14 +12,40 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+// RequireAuth is an authentication middleware that validates JWT tokens
+// @Summary Authentication middleware
+// @Description Verifies user authentication using JWT access token or refresh token flow.
+// @Security ApiKeyAuth
+// @Tags Authentication
+// @Param Cookie header string true "Access token" default(access_token=your_token_here)
+// @Param Cookie header string true "Refresh token" default(refresh_token=your_token_here)
+// @Success 200 {object} object "Authenticated successfully"
+// @Failure 302 "Redirect to login page when not authenticated"
+// @Failure 401 {object} object "Unauthorized - Invalid or expired tokens"
+// @SecurityDefinitions
+// @ApiKeyAuth:
+//
+//	type: apiKey
+//	in: cookie
+//	name: access_token
+//
+// Middleware flow:
+// 1. Checks for valid access_token cookie first
+// 2. If access_token is invalid/expired, checks for refresh_token
+// 3. With valid refresh_token:
+//   - Generates new tokens
+//   - Updates cookies and DB
+//   - Continues request with new auth context
+//
+// 4. With no valid tokens: redirects to /login
 func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		var userID int
-		jwtCookie, jwtErr := r.Cookie("jwt_token")
+		jwtCookie, jwtErr := r.Cookie("access_token")
 		var err error
 		if jwtErr == nil && jwtCookie != nil && jwtCookie.Value != "" {
-			userID, err = ParseToken(jwtCookie.Value)
+			userID, err = service.ParseToken(jwtCookie.Value)
 			if err != nil {
 				log.Printf("JWT validation failed: %v", err)
 			} else if userID > 0 {
@@ -42,11 +69,11 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 				}
 
 				// 3. Обновляем оба токена
-				new_JWToken, err := GenerateJWToken(email, password)
+				new_JWToken, err := service.GenerateJWToken(email, password)
 				if err != nil {
-					log.Printf("Ошибка при получении new_JWToken: %v", err)
+					log.Printf("Ошибка при получении new_access_token: %v", err)
 				}
-				new_Refresh_Token, err := GenerateRefreshToken()
+				new_Refresh_Token, err := service.GenerateRefreshToken()
 				if err != nil {
 					log.Printf("Ошибка при получении new_Refresh_token : %v", err)
 				}
@@ -58,7 +85,8 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 				next.ServeHTTP(w, r.WithContext(ctx1))
 
 			} else {
-				log.Println("UserID == 0")
+				log.Println("Пользователь не авторизован: UserID == 0")
+				log.Println(http.StatusUnauthorized)
 			}
 
 		} else {
@@ -100,7 +128,7 @@ func Save_New_Refresh_token(userID int, New_Refresh_Token string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	RefreshTokenExpiresAt := time.Now().Add(RefreshTokenTTL)
+	RefreshTokenExpiresAt := time.Now().Add(service.RefreshTokenTTL)
 	query := `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`
 	_, err = db.Exec(ctx, query, userID, New_Refresh_Token, RefreshTokenExpiresAt)
 	if err != nil {
@@ -110,9 +138,9 @@ func Save_New_Refresh_token(userID int, New_Refresh_Token string) {
 }
 func SetAuthCookies(w http.ResponseWriter, new_JWToken, new_Refresh_Token string) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "jwt_token",
+		Name:     "access_token",
 		Value:    new_JWToken,
-		Expires:  time.Now().Add(TokenTTL),
+		Expires:  time.Now().Add(service.TokenTTL),
 		HttpOnly: true,
 		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
@@ -120,7 +148,7 @@ func SetAuthCookies(w http.ResponseWriter, new_JWToken, new_Refresh_Token string
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    new_Refresh_Token,
-		Expires:  time.Now().Add(RefreshTokenTTL),
+		Expires:  time.Now().Add(service.RefreshTokenTTL),
 		HttpOnly: true,
 		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
