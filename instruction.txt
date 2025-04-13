@@ -1,6 +1,8 @@
 Команды для установки swagger:
 1. go get -u github.com/swaggo/swag/cmd/swag
 2. go get -u github.com/swaggo/http-swagger/v2
+export PATH=$PATH:$(go env GOPATH)/bin
+
 
 Команда для создания папки docs:
 swag init -g cmd/main.go
