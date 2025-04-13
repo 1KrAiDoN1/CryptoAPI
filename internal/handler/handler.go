@@ -30,7 +30,9 @@ func HandleFunc() {
 	http.HandleFunc("/saveFavoriteCrypto/", RequireAuth(saveFavoriteCrypto))
 	http.HandleFunc("/sendUserRegistrationData", SendUserRegistrationData)
 	http.HandleFunc("/logout", logout)
-	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)
+	http.Handle("/swagger/", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"), // Явно указываем путь
+	))
 
 	log.Println("Сервер запущен")
 	http.ListenAndServe(":8080", nil)

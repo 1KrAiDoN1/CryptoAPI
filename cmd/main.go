@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "helloapp/docs"
 	"helloapp/internal/handler"
 )
 
