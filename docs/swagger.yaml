@@ -1,4 +1,4 @@
-basePath: /api/v1
+basePath: /
 definitions:
   handler.DataInfo:
     properties:
@@ -184,7 +184,37 @@ paths:
       summary: Get personal account data
       tags:
       - User
-  /register:
+  /saveFavoriteCrypto/{crypto_name}:
+    post:
+      description: Saves specified cryptocurrency to authenticated user's favorites
+        list
+      parameters:
+      - description: Cryptocurrency ID or symbol
+        in: path
+        name: crypto_name
+        required: true
+        type: string
+      responses:
+        "303":
+          description: Redirect to personal account page
+        "400":
+          description: Bad Request - Missing cryptocurrency ID
+          schema:
+            type: string
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Add favorite cryptocurrency
+      tags:
+      - User
+  /sendUserRegistrationData:
     post:
       consumes:
       - application/x-www-form-urlencoded
@@ -216,36 +246,6 @@ paths:
       summary: Register new user
       tags:
       - Authentication
-  /saveFavoriteCrypto/{crypto_name}:
-    post:
-      description: Saves specified cryptocurrency to authenticated user's favorites
-        list
-      parameters:
-      - description: Cryptocurrency ID or symbol
-        in: path
-        name: crypto_name
-        required: true
-        type: string
-      responses:
-        "303":
-          description: Redirect to personal account page
-        "400":
-          description: Bad Request - Missing cryptocurrency ID
-          schema:
-            type: string
-        "401":
-          description: Unauthorized - User not authenticated
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Add favorite cryptocurrency
-      tags:
-      - User
   /verification:
     post:
       consumes:

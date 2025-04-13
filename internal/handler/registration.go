@@ -49,7 +49,7 @@ import (
 // @Success 303 "Redirect to home page on success"
 // @Failure 400 {string} string "Bad Request - Missing email or password"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /register [post]
+// @Router /sendUserRegistrationData [post]
 //
 // Registration Flow:
 // 1. Validates email and password presence

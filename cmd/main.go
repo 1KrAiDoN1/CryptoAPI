@@ -15,7 +15,7 @@ import (
 // @contact.email pavelvasilev24843@gmail.com
 
 // @host localhost:8080
-// @BasePath /api/v1
+// @BasePath /
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in cookie

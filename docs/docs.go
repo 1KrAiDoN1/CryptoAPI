@@ -216,7 +216,53 @@ const docTemplate = `{
                 }
             }
         },
-        "/register": {
+        "/saveFavoriteCrypto/{crypto_name}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Saves specified cryptocurrency to authenticated user's favorites list",
+                "tags": [
+                    "User"
+                ],
+                "summary": "Add favorite cryptocurrency",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cryptocurrency ID or symbol",
+                        "name": "crypto_name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "303": {
+                        "description": "Redirect to personal account page"
+                    },
+                    "400": {
+                        "description": "Bad Request - Missing cryptocurrency ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/sendUserRegistrationData": {
             "post": {
                 "description": "Creates new user account with email and password",
                 "consumes": [
@@ -251,52 +297,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request - Missing email or password",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/saveFavoriteCrypto/{crypto_name}": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Saves specified cryptocurrency to authenticated user's favorites list",
-                "tags": [
-                    "User"
-                ],
-                "summary": "Add favorite cryptocurrency",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Cryptocurrency ID or symbol",
-                        "name": "crypto_name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "303": {
-                        "description": "Redirect to personal account page"
-                    },
-                    "400": {
-                        "description": "Bad Request - Missing cryptocurrency ID",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - User not authenticated",
                         "schema": {
                             "type": "string"
                         }
@@ -456,7 +456,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/api/v1",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Crypto Market API",
 	Description:      "API server for Crypto Market",
