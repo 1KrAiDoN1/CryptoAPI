@@ -4,7 +4,7 @@ import (
 	"context"
 	// "errors"
 	// "fmt"
-	"helloapp/internal/service"
+	"helloapp/internal/auth"
 	"log"
 	"net/http"
 	"time"
@@ -45,7 +45,7 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 		jwtCookie, jwtErr := r.Cookie("access_token")
 		var err error
 		if jwtErr == nil && jwtCookie != nil && jwtCookie.Value != "" {
-			userID, err = service.ParseToken(jwtCookie.Value)
+			userID, err = auth.ParseToken(jwtCookie.Value)
 			if err != nil {
 				log.Printf("JWT validation failed: %v", err)
 			} else if userID > 0 {
@@ -69,11 +69,11 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 				}
 
 				// 3. Обновляем оба токена
-				new_JWToken, err := service.GenerateJWToken(email, password)
+				new_JWToken, err := auth.GenerateJWToken(email, password)
 				if err != nil {
 					log.Printf("Ошибка при получении new_access_token: %v", err)
 				}
-				new_Refresh_Token, err := service.GenerateRefreshToken()
+				new_Refresh_Token, err := auth.GenerateRefreshToken()
 				if err != nil {
 					log.Printf("Ошибка при получении new_Refresh_token : %v", err)
 				}
@@ -128,7 +128,7 @@ func Save_New_Refresh_token(userID int, New_Refresh_Token string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	RefreshTokenExpiresAt := time.Now().Add(service.RefreshTokenTTL)
+	RefreshTokenExpiresAt := time.Now().Add(auth.RefreshTokenTTL)
 	query := `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`
 	_, err = db.Exec(ctx, query, userID, New_Refresh_Token, RefreshTokenExpiresAt)
 	if err != nil {
@@ -140,7 +140,7 @@ func SetAuthCookies(w http.ResponseWriter, new_JWToken, new_Refresh_Token string
 	http.SetCookie(w, &http.Cookie{
 		Name:     "access_token",
 		Value:    new_JWToken,
-		Expires:  time.Now().Add(service.TokenTTL),
+		Expires:  time.Now().Add(auth.TokenTTL),
 		HttpOnly: true,
 		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
@@ -148,7 +148,7 @@ func SetAuthCookies(w http.ResponseWriter, new_JWToken, new_Refresh_Token string
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    new_Refresh_Token,
-		Expires:  time.Now().Add(service.RefreshTokenTTL),
+		Expires:  time.Now().Add(auth.RefreshTokenTTL),
 		HttpOnly: true,
 		Path:     "/",
 		SameSite: http.SameSiteLaxMode,

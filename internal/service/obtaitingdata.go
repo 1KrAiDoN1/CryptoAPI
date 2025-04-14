@@ -2,12 +2,11 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"helloapp/internal/models"
 	"io"
-	"log"
+
 	"net/http"
 	"strings"
 	"sync"
@@ -15,34 +14,6 @@ import (
 
 	"github.com/jackc/pgx/v4"
 )
-
-func GetUserIdFromDB(email string, password string) int {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	// подключение к базе данных
-	db, err := pgx.Connect(ctx, connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close(ctx)
-
-	// Проверка подключения
-	err = db.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var UserId int
-	query := "SELECT id FROM users WHERE email = $1 AND password = $2"
-	err = db.QueryRow(ctx, query, email, HashToken(password)).Scan(&UserId)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return 0
-		}
-		return 0
-	}
-	return UserId
-
-}
 
 func GetUserEmailFromDB(userID int) (string, error) {
 	ctx := context.Background()

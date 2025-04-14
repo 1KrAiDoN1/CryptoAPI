@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"helloapp/internal/auth"
 	"helloapp/internal/models"
 	"helloapp/internal/service"
 	"helloapp/pkg/format"
@@ -28,7 +29,7 @@ func HandleFunc() {
 	http.HandleFunc("/login", authorization_window)
 	http.HandleFunc("/verification", Verification_User)
 	http.HandleFunc("/saveFavoriteCrypto/", RequireAuth(saveFavoriteCrypto))
-	http.HandleFunc("/sendUserRegistrationData", SendUserRegistrationData)
+	http.HandleFunc("/sendUserRegistrationData", auth.SendUserRegistrationData)
 	http.HandleFunc("/logout", logout)
 	http.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), // Явно указываем путь
@@ -276,17 +277,17 @@ func authorization_window(w http.ResponseWriter, r *http.Request) {
 // 5. Redirects to /home
 func Verification_User(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		var user service.SignInUser
+		var user auth.SignInUser
 		user.Email = r.FormValue("email")
 		user.Password = r.FormValue("password")
 
-		userID := service.GetUserIdFromDB(user.Email, user.Password)
+		userID := auth.GetUserIdFromDB(user.Email, user.Password)
 		if userID == 0 {
 			http.Error(w, "User not found", http.StatusUnauthorized)
 			return
 		}
 
-		JWToken, RefreshToken, err := service.GetTokens(user.Email, user.Password) // генерируем два токена
+		JWToken, RefreshToken, err := auth.GetTokens(user.Email, user.Password) // генерируем два токена
 		if err != nil {
 			http.Error(w, "Error generating token", http.StatusInternalServerError)
 			return
@@ -303,7 +304,7 @@ func Verification_User(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		RefreshTokenExpiresAt := time.Now().Add(service.RefreshTokenTTL)
+		RefreshTokenExpiresAt := time.Now().Add(auth.RefreshTokenTTL)
 		query := `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`
 		_, err = db.Exec(ctx, query, userID, RefreshToken, RefreshTokenExpiresAt)
 		if err != nil {
@@ -316,7 +317,7 @@ func Verification_User(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{
 			Name:     "access_token",
 			Value:    JWToken,
-			Expires:  time.Now().Add(service.TokenTTL),
+			Expires:  time.Now().Add(auth.TokenTTL),
 			HttpOnly: true,
 			//Secure:   true,
 			Path:     "/",
@@ -326,7 +327,7 @@ func Verification_User(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{
 			Name:     "refresh_token",
 			Value:    RefreshToken,
-			Expires:  time.Now().Add(service.RefreshTokenTTL),
+			Expires:  time.Now().Add(auth.RefreshTokenTTL),
 			HttpOnly: true,
 			//Secure:   true,
 			Path:     "/",

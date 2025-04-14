@@ -5,8 +5,6 @@ import (
 	"helloapp/internal/handler"
 )
 
-//проверка
-
 // @title Crypto Market API
 // @version 1.0
 // @description API server for Crypto Market
@@ -27,7 +25,6 @@ import (
 // @name refresh_token
 // @description Refresh token in cookie
 func main() {
-
 	handler.HandleFunc()
 
 }
