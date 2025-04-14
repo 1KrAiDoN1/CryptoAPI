@@ -1,7 +1,9 @@
-package service
+package auth
 
 import (
+	"context"
 	"crypto/sha1"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -11,6 +13,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
 )
 
@@ -62,7 +65,14 @@ func ParseToken(access_token string) (int, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return 0, errors.New("unexpected signing method")
 		}
+		err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/secretHash.env")
+		if err != nil {
+			log.Println("Ошибка при чтении файла конфигурации")
+		}
 		secretSignInKey := os.Getenv("SECRET_SIGNINKEY")
+		if secretSignInKey == "" {
+			return 0, errors.New("secret key not configured")
+		}
 		return []byte(secretSignInKey), nil // func ParseToken принимает токен, структуру для хранения данных о токене (в данном случае &jwt.StandardClaims{})
 		// и функцию, которая возвращает секретный ключ для проверки подписи токена.
 	})
@@ -79,6 +89,33 @@ func ParseToken(access_token string) (int, error) {
 	}
 
 	return 0, errors.New("invalid token")
+}
+func GetUserIdFromDB(email string, password string) int {
+	ctx := context.Background()
+	connStr := "postgres://postgres:admin@localhost:5432/registration"
+	// подключение к базе данных
+	db, err := pgx.Connect(ctx, connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close(ctx)
+
+	// Проверка подключения
+	err = db.Ping(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var UserId int
+	query := "SELECT id FROM users WHERE email = $1 AND password = $2"
+	err = db.QueryRow(ctx, query, email, HashToken(password)).Scan(&UserId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0
+		}
+		return 0
+	}
+	return UserId
+
 }
 
 func HashToken(Password string) string {

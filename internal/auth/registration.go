@@ -1,16 +1,16 @@
-package handler
+package auth
 
 import (
 	"context"
 	"crypto/sha1"
 	"fmt"
-	"helloapp/internal/service"
+	"helloapp/internal/database"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/jackc/pgx/v4"
+	// "github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
 )
 
@@ -71,19 +71,12 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		ctx := context.Background()
-		connStr := "postgres://postgres:admin@localhost:5432/registration"
-		// подключение к базе данных
-		db, err := pgx.Connect(ctx, connStr)
+		cfg := database.GetDBconfig()
+		db, err := database.ConnectDB(cfg)
 		if err != nil {
-			log.Fatal(err)
+			http.Error(w, "Error connecting to database", http.StatusInternalServerError)
 		}
 		defer db.Close(ctx)
-
-		// Проверка подключения
-		err = db.Ping(ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
 
 		query := `INSERT INTO users (email, password, registeredat) VALUES ($1, $2, $3)`
 		_, err = db.Exec(ctx, query, email, Hash(Password), timeOfRegistration)
@@ -94,10 +87,10 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 		log.Printf("Пользователь с почтой %s зарегистрирован", email)
-		log.Printf("ID пользователя с почтой %s в базе данных: %d", email, service.GetUserIdFromDB(email, Password))
-		token, _ := service.GenerateJWToken(email, Password)
+		log.Printf("ID пользователя с почтой %s в базе данных: %d", email, GetUserIdFromDB(email, Password))
+		token, _ := GenerateJWToken(email, Password)
 		log.Print("token пользователя:", token)
-		id_from_token, _ := service.ParseToken(token)
+		id_from_token, _ := ParseToken(token)
 		log.Print("Полученный ID из токена: ", id_from_token)
 
 	}
