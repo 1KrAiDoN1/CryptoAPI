@@ -76,10 +76,10 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, "Error connecting to database", http.StatusInternalServerError)
 		}
-		defer db.Close(ctx)
+		defer db.DB.Close(ctx)
 
 		query := `INSERT INTO users (email, password, registeredat) VALUES ($1, $2, $3)`
-		_, err = db.Exec(ctx, query, email, Hash(Password), timeOfRegistration)
+		_, err = db.DB.Exec(ctx, query, email, Hash(Password), timeOfRegistration)
 		if err != nil {
 			log.Printf("Ошибка вставки данных: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

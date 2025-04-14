@@ -11,7 +11,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func ConnectDB(cfg DB) (*pgx.Conn, error) {
+type Storage struct {
+	DB *pgx.Conn
+}
+
+func ConnectDB(cfg DB) (*Storage, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/secretHash.env")
@@ -28,7 +32,7 @@ func ConnectDB(cfg DB) (*pgx.Conn, error) {
 		log.Fatal(err)
 	}
 	fmt.Println(dbConnStr)
-	return db, nil
+	return &Storage{DB: db}, nil
 
 }
 
