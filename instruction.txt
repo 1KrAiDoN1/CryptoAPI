@@ -3,6 +3,9 @@
 2. go get -u github.com/swaggo/http-swagger/v2
 export PATH=$PATH:$(go env GOPATH)/bin
 
+Путь к корневой папке:
+cd /Users/pavelvasilev/Desktop
+cd CryptoAPI
 
 Команда для создания папки docs:
 swag init -g cmd/main.go
