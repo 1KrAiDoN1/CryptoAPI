@@ -18,8 +18,7 @@ import (
 func GetUserEmailFromDB(userID int) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}
@@ -37,8 +36,7 @@ func GetUserEmailFromDB(userID int) (string, error) {
 func GetTimeOfRegistrationFromDB(userID int) (time.Time, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}
@@ -67,8 +65,7 @@ func GetTimeOfRegistrationFromDB(userID int) (time.Time, error) {
 func GetCryptoID(cryptoName string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}
@@ -85,8 +82,7 @@ func GetCryptoID(cryptoName string) (int, error) {
 func GetCryptoName(cryptoID int) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}
@@ -105,8 +101,7 @@ func GetFavoriteCoins(user_id int) ([]models.CoinStruct, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}

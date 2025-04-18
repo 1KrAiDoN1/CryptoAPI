@@ -99,8 +99,7 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 func Remove_The_Old_Refresh_Token(userID int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}
@@ -117,8 +116,7 @@ func Remove_The_Old_Refresh_Token(userID int) error {
 func Save_New_Refresh_token(userID int, New_Refresh_Token string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}
@@ -153,8 +151,7 @@ func SetAuthCookies(w http.ResponseWriter, new_JWToken, new_Refresh_Token string
 func Get_UserData_fromDB(userID int) (password, email string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}
@@ -171,8 +168,7 @@ func Get_UserData_fromDB(userID int) (password, email string, err error) {
 func Get_UserID_By_Refresh_Token(refresh_token string) (userID int, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}

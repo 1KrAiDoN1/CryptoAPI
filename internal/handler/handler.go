@@ -20,15 +20,15 @@ import (
 )
 
 func HandleFunc() {
-	http.HandleFunc("/home", RequireAuth(showInfo)) // Передаем данные о криптовалюте в обработчик
-	http.HandleFunc("/crypto/", RequireAuth(showCryptoDetails))
-	http.HandleFunc("/personal_account", RequireAuth(showPersonalAccount))
-	http.HandleFunc("/sign_up", registration_window)
-	http.HandleFunc("/login", authorization_window)
+	http.HandleFunc("/home", RequireAuth(ShowInfo)) // Передаем данные о криптовалюте в обработчик
+	http.HandleFunc("/crypto/", RequireAuth(ShowCryptoDetails))
+	http.HandleFunc("/personal_account", RequireAuth(ShowPersonalAccount))
+	http.HandleFunc("/sign_up", Registration_window)
+	http.HandleFunc("/login", Authorization_window)
 	http.HandleFunc("/verification", Verification_User)
-	http.HandleFunc("/saveFavoriteCrypto/", RequireAuth(saveFavoriteCrypto))
+	http.HandleFunc("/saveFavoriteCrypto/", RequireAuth(SaveFavoriteCrypto))
 	http.HandleFunc("/sendUserRegistrationData", auth.SendUserRegistrationData)
-	http.HandleFunc("/logout", logout)
+	http.HandleFunc("/logout", Logout)
 	http.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), // Явно указываем путь
 	))
@@ -62,7 +62,7 @@ func HandleFunc() {
 // 2. Extracts cryptocurrency ID from URL path
 // 3. Saves to user's favorites in database
 // 4. Redirects to /personal_account
-func saveFavoriteCrypto(w http.ResponseWriter, r *http.Request) {
+func SaveFavoriteCrypto(w http.ResponseWriter, r *http.Request) {
 	userIDVal := r.Context().Value("userID").(int)
 	if userIDVal == 0 {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -106,7 +106,7 @@ func saveFavoriteCrypto(w http.ResponseWriter, r *http.Request) {
 // 2. Removes token from database if found
 // 3. Clears both access and refresh token cookies
 // 4. Redirects to login page
-func logout(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request) {
 	refresh_token, _ := r.Cookie("refresh_token")
 	if refresh_token != nil {
 		userID, _ := Get_UserID_By_Refresh_Token(refresh_token.Value)
@@ -176,7 +176,7 @@ type DataUser struct {
 // - Uses HTML templating with custom formatting functions
 // - Implements 5-second timeout for loading favorite coins
 // - May return partial data if some components fail to load
-func showPersonalAccount(w http.ResponseWriter, r *http.Request) {
+func ShowPersonalAccount(w http.ResponseWriter, r *http.Request) {
 
 	userID := r.Context().Value("userID").(int)
 	email, err := service.GetUserEmailFromDB(userID)
@@ -222,7 +222,7 @@ func showPersonalAccount(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func registration_window(w http.ResponseWriter, r *http.Request) {
+func Registration_window(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("../pkg/templates/registration.html")
 	if err != nil {
 		log.Print("Ошибка при чтении шаблона:", err)
@@ -234,7 +234,7 @@ func registration_window(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func authorization_window(w http.ResponseWriter, r *http.Request) {
+func Authorization_window(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("../pkg/templates/authorization.html")
 	if err != nil {
 		log.Print("Ошибка при чтении шаблона:", err)
@@ -291,8 +291,7 @@ func Verification_User(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ctx := context.Background()
-		cfg := database.GetDBconfig()
-		db, err := database.ConnectDB(cfg)
+		db, err := database.ConnectDB()
 		if err != nil {
 			log.Println("Error connecting to database", err)
 		}
@@ -356,7 +355,7 @@ type DataInfo struct {
 //	   Email string `json:"email"`    // User's email (if authenticated)
 //	   Output []service.CryptoData `json:"data"` // Array of cryptocurrency data
 //	}
-func showInfo(w http.ResponseWriter, r *http.Request) {
+func ShowInfo(w http.ResponseWriter, r *http.Request) {
 	output, err := service.GetCryptoData()
 	if err != nil {
 		fmt.Println("Ошибка при получении данных", err, http.StatusInternalServerError)
@@ -429,7 +428,7 @@ func showInfo(w http.ResponseWriter, r *http.Request) {
 // 2. Extracts cryptocurrency ID from URL path
 // 3. Fetches detailed crypto data from service
 // 4. Renders crypto_details.html template with data
-func showCryptoDetails(w http.ResponseWriter, r *http.Request) {
+func ShowCryptoDetails(w http.ResponseWriter, r *http.Request) {
 	// получем userID из контекста
 	// если токен не валиден или пользователь не авторизован, перенаправляем на страницу авторизации
 	userIDVal := r.Context().Value("userID")
