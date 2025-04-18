@@ -3,31 +3,28 @@ package service
 import (
 	"context"
 	"log"
+	"time"
 
-	"github.com/jackc/pgx/v4"
+	"helloapp/internal/database"
 )
 
 func AddFavoriteCryptoDB(userID int, cryptoName string) error {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		log.Println("Ошибка при подключении к базе данных", err)
-		return err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
 
 	cryptoID, err := GetCryptoID(cryptoName)
 	if err != nil {
 		log.Println("Ошибка при получении ID криптовалюты", err)
 	}
 
-	err = db.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
 	query := `INSERT INTO user_favorites (user_id, crypto_id) VALUES ($1, $2)`
-	_, err = db.Exec(ctx, query, userID, cryptoID)
+	_, err = db.DB.Exec(ctx, query, userID, cryptoID)
 	if err != nil {
 		log.Printf("Ошибка вставки данных: %v", err)
 		return err

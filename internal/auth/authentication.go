@@ -12,8 +12,9 @@ import (
 	"strconv"
 	"time"
 
+	"helloapp/internal/database"
+
 	"github.com/golang-jwt/jwt"
-	"github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
 )
 
@@ -92,22 +93,15 @@ func ParseToken(access_token string) (int, error) {
 }
 func GetUserIdFromDB(email string, password string) int {
 	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	// подключение к базе данных
-	db, err := pgx.Connect(ctx, connStr)
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
-
-	// Проверка подключения
-	err = db.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
+	defer db.DB.Close(ctx)
 	var UserId int
 	query := "SELECT id FROM users WHERE email = $1 AND password = $2"
-	err = db.QueryRow(ctx, query, email, HashToken(password)).Scan(&UserId)
+	err = db.DB.QueryRow(ctx, query, email, HashToken(password)).Scan(&UserId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return 0

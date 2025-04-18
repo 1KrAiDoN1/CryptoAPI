@@ -74,7 +74,7 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 		cfg := database.GetDBconfig()
 		db, err := database.ConnectDB(cfg)
 		if err != nil {
-			http.Error(w, "Error connecting to database", http.StatusInternalServerError)
+			log.Println("Error connecting to database", http.StatusInternalServerError)
 		}
 		defer db.DB.Close(ctx)
 

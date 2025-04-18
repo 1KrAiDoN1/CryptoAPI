@@ -7,26 +7,27 @@ import (
 	"helloapp/internal/models"
 	"io"
 
+	"helloapp/internal/database"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/jackc/pgx/v4"
 )
 
 func GetUserEmailFromDB(userID int) (string, error) {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		return "", err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
 
 	var email string
 	query := "SELECT email FROM users WHERE id = $1"
-	err = db.QueryRow(ctx, query, userID).Scan(&email)
+	err = db.DB.QueryRow(ctx, query, userID).Scan(&email)
 	if err != nil {
 		return "", err
 	}
@@ -34,17 +35,18 @@ func GetUserEmailFromDB(userID int) (string, error) {
 }
 
 func GetTimeOfRegistrationFromDB(userID int) (time.Time, error) {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		return time.Time{}, err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
 
 	var timeOfRegistration string
 	query := "SELECT registeredat FROM users WHERE id = $1"
-	err = db.QueryRow(ctx, query, userID).Scan(&timeOfRegistration)
+	err = db.DB.QueryRow(ctx, query, userID).Scan(&timeOfRegistration)
 	if err != nil {
 		return time.Time{}, err
 	}
@@ -63,16 +65,17 @@ func GetTimeOfRegistrationFromDB(userID int) (time.Time, error) {
 }
 
 func GetCryptoID(cryptoName string) (int, error) {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		return 0, err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
 	var id int
 	query := "SELECT id FROM cryptocurrencies WHERE name = $1"
-	err = db.QueryRow(ctx, query, cryptoName).Scan(&id)
+	err = db.DB.QueryRow(ctx, query, cryptoName).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -80,16 +83,18 @@ func GetCryptoID(cryptoName string) (int, error) {
 }
 
 func GetCryptoName(cryptoID int) (string, error) {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		return "", err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
+
 	var cryptoName string
 	query := "SELECT name FROM cryptocurrencies WHERE id = $1"
-	err = db.QueryRow(ctx, query, cryptoID).Scan(&cryptoName)
+	err = db.DB.QueryRow(ctx, query, cryptoID).Scan(&cryptoName)
 	if err != nil {
 		return "", err
 	}
@@ -98,15 +103,17 @@ func GetCryptoName(cryptoID int) (string, error) {
 
 func GetFavoriteCoins(user_id int) ([]models.CoinStruct, error) {
 
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		return nil, err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
+
 	query := `SELECT crypto_id FROM user_favorites WHERE user_id = $1`
-	rows, err := db.Query(ctx, query, user_id)
+	rows, err := db.DB.Query(ctx, query, user_id)
 	if err != nil {
 		return nil, fmt.Errorf("query favorites error: %v", err)
 	}

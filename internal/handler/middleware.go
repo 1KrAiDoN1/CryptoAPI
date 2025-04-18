@@ -5,11 +5,10 @@ import (
 	// "errors"
 	// "fmt"
 	"helloapp/internal/auth"
+	"helloapp/internal/database"
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/jackc/pgx/v4"
 )
 
 // RequireAuth is an authentication middleware that validates JWT tokens
@@ -98,17 +97,17 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func Remove_The_Old_Refresh_Token(userID int) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 150*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		return err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
 
 	query := `DELETE FROM refresh_tokens WHERE user_id = $1`
-	_, err = db.Exec(ctx, query, userID)
+	_, err = db.DB.Exec(ctx, query, userID)
 	if err != nil {
 		return err
 	}
@@ -116,21 +115,17 @@ func Remove_The_Old_Refresh_Token(userID int) error {
 	return nil
 }
 func Save_New_Refresh_token(userID int, New_Refresh_Token string) {
-	ctx := context.Background()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		log.Fatalf("ошибка при коннекте к базе данных: %v\n", err)
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
-
-	err = db.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
+	defer db.DB.Close(ctx)
 	RefreshTokenExpiresAt := time.Now().Add(auth.RefreshTokenTTL)
 	query := `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`
-	_, err = db.Exec(ctx, query, userID, New_Refresh_Token, RefreshTokenExpiresAt)
+	_, err = db.DB.Exec(ctx, query, userID, New_Refresh_Token, RefreshTokenExpiresAt)
 	if err != nil {
 		log.Printf("Ошибка вставки данных: %v", err)
 		return
@@ -156,17 +151,17 @@ func SetAuthCookies(w http.ResponseWriter, new_JWToken, new_Refresh_Token string
 }
 
 func Get_UserData_fromDB(userID int) (password, email string, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 150*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		return "", "", err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
 
 	query := `SELECT email, password FROM users WHERE id = $1`
-	err = db.QueryRow(ctx, query, userID).Scan(&email, &password)
+	err = db.DB.QueryRow(ctx, query, userID).Scan(&email, &password)
 	if err != nil {
 		return "", "", err
 	}
@@ -174,16 +169,16 @@ func Get_UserData_fromDB(userID int) (password, email string, err error) {
 }
 
 func Get_UserID_By_Refresh_Token(refresh_token string) (userID int, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 150*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	connStr := "postgres://postgres:admin@localhost:5432/registration"
-	db, err := pgx.Connect(ctx, connStr)
+	cfg := database.GetDBconfig()
+	db, err := database.ConnectDB(cfg)
 	if err != nil {
-		return 0, err
+		log.Println("Error connecting to database", err)
 	}
-	defer db.Close(ctx)
+	defer db.DB.Close(ctx)
 	query := `SELECT user_id FROM refresh_tokens WHERE token = $1`
-	err = db.QueryRow(ctx, query, refresh_token).Scan(&userID)
+	err = db.DB.QueryRow(ctx, query, refresh_token).Scan(&userID)
 	if err != nil {
 		return 0, err
 	}

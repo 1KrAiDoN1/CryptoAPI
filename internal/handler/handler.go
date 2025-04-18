@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"helloapp/internal/auth"
+	"helloapp/internal/database"
 	"helloapp/internal/models"
 	"helloapp/internal/service"
 	"helloapp/pkg/format"
@@ -14,11 +15,8 @@ import (
 	"time"
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
-
 	//"database/sql"
-
 	//"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v4"
 )
 
 func HandleFunc() {
@@ -293,20 +291,15 @@ func Verification_User(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ctx := context.Background()
-		connStr := "postgres://postgres:admin@localhost:5432/registration"
-		db, err := pgx.Connect(ctx, connStr)
+		cfg := database.GetDBconfig()
+		db, err := database.ConnectDB(cfg)
 		if err != nil {
-			log.Fatalf("ошибка при коннекте к базе данных: %v\n", err)
+			log.Println("Error connecting to database", err)
 		}
-		defer db.Close(ctx)
-
-		err = db.Ping(ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
+		defer db.DB.Close(ctx)
 		RefreshTokenExpiresAt := time.Now().Add(auth.RefreshTokenTTL)
 		query := `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)`
-		_, err = db.Exec(ctx, query, userID, RefreshToken, RefreshTokenExpiresAt)
+		_, err = db.DB.Exec(ctx, query, userID, RefreshToken, RefreshTokenExpiresAt)
 		if err != nil {
 			log.Printf("Ошибка вставки данных: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

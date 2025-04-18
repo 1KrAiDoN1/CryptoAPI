@@ -31,7 +31,6 @@ func ConnectDB(cfg DB) (*Storage, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(dbConnStr)
 	return &Storage{DB: db}, nil
 
 }
