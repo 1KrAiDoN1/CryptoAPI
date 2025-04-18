@@ -93,8 +93,7 @@ func ParseToken(access_token string) (int, error) {
 }
 func GetUserIdFromDB(email string, password string) int {
 	ctx := context.Background()
-	cfg := database.GetDBconfig()
-	db, err := database.ConnectDB(cfg)
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Println("Error connecting to database", err)
 	}

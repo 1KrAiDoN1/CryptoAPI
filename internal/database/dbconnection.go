@@ -15,7 +15,8 @@ type Storage struct {
 	DB *pgx.Conn
 }
 
-func ConnectDB(cfg DB) (*Storage, error) {
+func ConnectDB() (*Storage, error) {
+	cfg := GetDBconfig()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/secretHash.env")
