@@ -1,0 +1,4 @@
+migrationsDROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS user_favorites CASCADE;
+DROP TABLE IF EXISTS refresh_tokens CASCADE;
+DROP TABLE IF EXISTS cryptocurrencies CASCADE;
