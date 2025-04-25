@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"helloapp/internal/models"
+
+	"helloapp/internal/repository"
 	"io"
 	"net/http"
 	"sync"
@@ -126,4 +128,28 @@ func GetCryptoData() ([]models.CoinStruct, error) {
 		return []models.CoinStruct{}, fmt.Errorf("request timeout")
 
 	}
+}
+
+type TokenOperations struct {
+	repo repository.TokenRepository
+}
+
+func (t *TokenOperations) GenerateJWToken(email string, password string) (string, error) {
+	return t.repo.GenerateJWToken(email, password)
+}
+
+func (t *TokenOperations) GetTokens(email string, password string) (string, string, error) {
+	return t.repo.GetTokens(email, password)
+}
+
+func (t *TokenOperations) GenerateRefreshToken() (string, error) {
+	return t.repo.GenerateRefreshToken()
+}
+
+func (t *TokenOperations) ParseToken(access_token string) (int, error) {
+	return t.repo.ParseToken(access_token)
+}
+
+func (t *TokenOperations) HashToken(Password string) string {
+	return t.repo.HashToken(Password)
 }
