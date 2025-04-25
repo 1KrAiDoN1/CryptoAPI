@@ -1,0 +1,1 @@
+docker-compose exec app sh -c "echo $DB_HOST"  # должно вывести "db"

@@ -1,0 +1,45 @@
+Установка Homebrew
+Вводим в терминале команду:
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+Установка PostgreSQL на Mac Os
+Установка через Homebrew:
+
+brew install postgres
+Добавляем в автозапуск при старте системы Mac OS.
+
+brew services start postgresql
+Также можно запустить вручную:
+
+pg_ctl -D /usr/local/var/postgres start
+Перезагрузка PostgreSQL
+
+brew services restart postgresql
+Провекра версии PostgreSQL в HomeBrew:
+
+brew info postgresql
+
+Команда для создания таблиц в postgres:
+psql -U postgres -d registration -f /Users/pavelvasilev/Desktop/CryptoAPI/migrations/01_init.sql
+
+Команда для удаления таблиц в postgres:
+psql -U postgres -d registration -f /Users/pavelvasilev/Desktop/CryptoAPI/migrations/001_init.sql
+
+Просмотр данных в таблице:
+docker-compose exec db psql -U postgres -d registration -c "SELECT * FROM "название таблицы";"
+
+Решение проблемы с занятым портом 5432
+
+Остановите существующие контейнеры PostgreSQL
+
+bash
+docker-compose down
+
+Проверьте, что не осталось процессов, использующих порт
+bash
+sudo lsof -i :5432
+
+Если найдутся процессы, завершите их:
+bash
+sudo kill -9 <PID>
