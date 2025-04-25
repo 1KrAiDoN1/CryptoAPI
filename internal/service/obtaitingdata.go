@@ -49,17 +49,23 @@ func GetTimeOfRegistrationFromDB(userID int) (time.Time, error) {
 		return time.Time{}, err
 	}
 	// Удаляем лишнюю часть строки (всё, что после временной зоны)
-	timeString := strings.Split(timeOfRegistration, " MSK")[0]
+	timeString := strings.Split(timeOfRegistration, " m=")[0]
 
-	// Указываем формат строки
-	layout := "2006-01-02 15:04:05.999999 -0700"
-
-	// Преобразуем строку в time.Time
-	parsedTime, err := time.Parse(layout, timeString)
-	if err != nil {
-		return time.Time{}, err
+	// Определяем возможные форматы
+	layouts := []string{
+		"2006-01-02 15:04:05.999999999 -0700 UTC",
+		"2006-01-02 15:04:05.999999 -0700 MSK",
+		"2006-01-02 15:04:05.999999999 -0700 MST",
 	}
-	return parsedTime, nil
+
+	// Пробуем распарсить каждым форматом
+	for _, layout := range layouts {
+		parsedTime, err := time.Parse(layout, timeString)
+		if err == nil {
+			return parsedTime, nil
+		}
+	}
+	return time.Time{}, err
 }
 
 func GetCryptoID(cryptoName string) (int, error) {
