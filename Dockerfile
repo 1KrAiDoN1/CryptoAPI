@@ -2,7 +2,7 @@
 FROM golang:1.23.1-alpine AS builder
 
 # Создаем и переходим в рабочую директорию
-WORKDIR /CryptoAPI
+WORKDIR /cryptoapi
 # Создаем структуру директорий
 RUN mkdir -p /Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/
 
@@ -28,3 +28,9 @@ RUN go build -o main ./cmd/main.go
 
 
 CMD ["./main"]
+
+
+
+
+
+
