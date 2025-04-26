@@ -1,1 +1,105 @@
-docker-compose exec app sh -c "echo $DB_HOST"  # должно вывести "db"
+Основные команды для работы с Docker Compose
+Сборка и запуск:
+
+bash
+docker-compose up -d --build
+-d - запуск в фоновом режиме
+
+--build - пересобрать образы перед запуском
+
+Остановка сервисов:
+
+bash
+docker-compose down
+Просмотр логов:
+
+bash
+docker-compose logs -f cryptoapi  # логи приложения
+docker-compose logs -f db        # логи базы данных
+Перезапуск сервиса:
+
+bash
+docker-compose restart cryptoapi
+Команды для работы с контейнерами
+Просмотр запущенных контейнеров:
+
+bash
+docker ps
+docker-compose ps
+Выполнение команд в контейнере:
+
+bash
+docker-compose exec cryptoapi sh  # войти в контейнер приложения
+docker-compose exec db psql -U postgres  # подключиться к PostgreSQL
+Остановка конкретного контейнера:
+
+bash
+docker-compose stop cryptoapi
+Команды для работы с образами
+Просмотр образов:
+
+bash
+docker images
+Удаление образов:
+
+bash
+docker rmi <image_id>
+Принудительная пересборка:
+
+bash
+docker-compose build --no-cache
+Команды для работы с томами (volumes)
+Просмотр томов:
+
+bash
+docker volume ls
+Удаление томов:
+
+bash
+docker volume prune
+Команды для очистки
+Остановить все контейнеры:
+
+bash
+docker stop $(docker ps -aq)
+Удалить все контейнеры:
+
+bash
+docker rm $(docker ps -aq)
+Полная очистка системы:
+
+bash
+docker system prune -a
+Полезные команды для разработки
+Запуск миграций (если используете golang-migrate):
+
+bash
+docker-compose exec cryptoapi migrate -path ./migrations -database "postgres://postgres:password@db:5432/dbname?sslmode=disable" up
+Запуск тестов:
+
+bash
+docker-compose exec cryptoapi go test ./...
+Проверка подключения к БД:
+
+bash
+docker-compose exec db pg_isready -U postgres
+Пример рабочего процесса:
+Сборка и запуск:
+
+bash
+docker-compose up -d --build
+Проверка статуса:
+
+bash
+docker-compose ps
+Просмотр логов:
+
+bash
+docker-compose logs -f cryptoapi
+Остановка:
+
+bash
+docker-compose down
+
+Просмотр контейнеров
+docker ps -a 

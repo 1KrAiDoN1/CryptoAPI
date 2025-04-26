@@ -16,7 +16,7 @@ pg_ctl -D /usr/local/var/postgres start
 Перезагрузка PostgreSQL
 
 brew services restart postgresql
-Провекра версии PostgreSQL в HomeBrew:
+Проверка версии PostgreSQL в HomeBrew:
 
 brew info postgresql
 
