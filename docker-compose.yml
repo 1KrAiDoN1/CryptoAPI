@@ -8,6 +8,7 @@ services:
     env_file:
       - ./internal/database/DB_Config.env
       - ./internal/database/secretHash.env
+    # command: sh -c "./wait-for.sh db:5432 -- ./main"
     depends_on:
       db:
         condition: service_healthy

@@ -16,6 +16,7 @@ COPY internal/database/secretHash.env ./internal/database/secretHash.env
 # Копируем шаблоны
 COPY internal/database/ /Users/pavelvasilev/Desktop/CryptoAPI/internal/database/
 COPY pkg/templates/ /Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/
+# COPY --from=builder /cryptoapi/migrations ./migrations
 
 # Проверяем, что файлы скопировались
 RUN ls -la /Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/
@@ -25,11 +26,10 @@ COPY . .
 
 # Собираем приложение
 RUN go build -o main ./cmd/main.go
+# RUN chmod +x wait-for.sh
 
 
 CMD ["./main"]
-
-
 
 
 
