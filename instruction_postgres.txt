@@ -21,10 +21,10 @@ brew services restart postgresql
 brew info postgresql
 
 Команда для создания таблиц в postgres:
-psql -U postgres -d registration -f /Users/pavelvasilev/Desktop/CryptoAPI/migrations/01_init.sql
+psql -U postgres -d registration -f /Users/pavelvasilev/Desktop/CryptoAPI/migrations/000001_init.up.sql
 
 Команда для удаления таблиц в postgres:
-psql -U postgres -d registration -f /Users/pavelvasilev/Desktop/CryptoAPI/migrations/001_init.sql
+psql -U postgres -d registration -f /Users/pavelvasilev/Desktop/CryptoAPI/migrations/000001_init.down.sql
 
 Просмотр данных в таблице:
 docker-compose exec db psql -U postgres -d registration -c "SELECT * FROM "название таблицы";"

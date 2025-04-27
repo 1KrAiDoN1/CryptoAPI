@@ -1,0 +1,114 @@
+1. Подготовка нового компьютера
+Установите необходимые компоненты:
+
+bash
+# Установите Docker
+sudo apt-get update && sudo apt-get install docker.io docker-compose
+# Проверьте установку
+docker --version && docker-compose --version
+2. Клонирование репозитория
+bash
+git clone https://github.com/ваш-username/ваш-репозиторий.git
+cd ваш-репозиторий
+3. Настройка окружения
+Создайте файлы окружения (если они не включены в репозиторий):
+
+bash
+cp internal/database/DB_Config.env.example internal/database/DB_Config.env
+cp internal/database/secretHash.env.example internal/database/secretHash.env
+Отредактируйте файлы .env с помощью nano/vim:
+
+bash
+nano internal/database/DB_Config.env
+4. Запуск проекта
+bash
+docker-compose up -d --build
+5. Проверка работы
+Откройте в браузере:
+
+http://localhost:8080
+Проверьте логи:
+
+bash
+docker-compose logs -f
+Дополнительные рекомендации
+Для продакшена:
+
+Используйте .env файл для хранения секретов
+
+Настройте правильные порты в docker-compose.yml
+
+Добавьте HTTPS через nginx
+
+Если возникают проблемы:
+
+bash
+# Проверьте запущенные контейнеры
+docker ps
+
+# Проверьте логи конкретного контейнера
+docker-compose logs cryptoapi
+
+# Пересоберите контейнеры
+docker-compose up -d --force-recreate --build
+Для обновления:
+
+bash
+git pull origin main
+docker-compose up -d --build
+
+// ДЛЯ ПУНКТА 3 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+1. Переход в директорию проекта
+bash
+cd путь/к/вашему/проекту  # например: cd ~/projects/CryptoAPI
+2. Создание файлов окружения из примеров
+bash
+# Для конфигурации базы данных
+cp internal/database/DB_Config.env.example internal/database/DB_Config.env
+
+# Для секретных ключей
+cp internal/database/secretHash.env.example internal/database/secretHash.env
+3. Редактирование DB_Config.env
+bash
+nano internal/database/DB_Config.env
+Пошагово внутри редактора:
+
+Нажмите Ctrl+Shift+V чтобы вставить (если копируете значения)
+
+
+# Пример содержимого:
+DB_USER=postgres
+DB_PASSWORD=admin
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=registration
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=admin
+POSTGRES_DB=registration
+Для сохранения:
+
+Нажмите Ctrl+O → Enter
+
+Нажмите Ctrl+X для выхода
+
+4. Редактирование secretHash.env
+bash
+nano internal/database/secretHash.env
+Пример заполнения:
+
+SECRET_STRING=G5t!mQ9@wZ2x#bR1
+SECRET_SIGNINKEY=G5t!mQ9@wZ2x#bR1
+
+5. Проверка файлов
+bash
+# Проверьте что файлы существуют
+ls -l internal/database/DB_Config.env internal/database/secretHash.env
+
+# Посмотрите содержимое (опционально)
+cat internal/database/DB_Config.env
+cat internal/database/secretHash.env
+6. Настройка прав доступа (рекомендуется)
+bash
+chmod 600 internal/database/*.env  # запрет доступа для других пользователей
+
+

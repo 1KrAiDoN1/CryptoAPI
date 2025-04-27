@@ -21,5 +21,4 @@ swag init -g cmd/main.go
 
 
 
-psql -U postgres -d registration -f /Users/pavelvasilev/Desktop/CryptoAPI/migrations/01_init.sql
 
