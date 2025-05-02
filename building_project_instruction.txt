@@ -94,10 +94,6 @@ POSTGRES_DB=registration
 4. Редактирование secretHash.env
 bash
 nano internal/database/secretHash.env
-Пример заполнения:
-
-SECRET_STRING=G5t!mQ9@wZ2x#bR1
-SECRET_SIGNINKEY=G5t!mQ9@wZ2x#bR1
 
 5. Проверка файлов
 bash
