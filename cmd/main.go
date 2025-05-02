@@ -28,4 +28,10 @@ func main() {
 
 	handler.HandleFunc()
 
+	// TODO:
+	// config init
+	// logger init
+	// storage init
+	// main goroutine init (with graceful shutdown or os.Exit)
+
 }
