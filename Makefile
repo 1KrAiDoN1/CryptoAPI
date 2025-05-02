@@ -3,7 +3,6 @@
 # Переменные
 DOCKER_COMPOSE = docker-compose
 
-
 build: ## Собрать контейнеры
 	$(DOCKER_COMPOSE) build --no-cache
 
@@ -16,9 +15,8 @@ down: ## Остановить контейнеры
 logs: ## Показать логи приложения
 	$(DOCKER_COMPOSE) logs -f cryptoapi
 
-migrate-up:
-    migrate -path ./migrations -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}?sslmode=disable" up
+migrate-up: ## Применить миграции
+	migrate -path ./migrations -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}?sslmode=disable" up
 
-migrate-down:
-    migrate -path ./migrations -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}?sslmode=disable" down	
-
+migrate-down: ## Откатить миграции
+	migrate -path ./migrations -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}?sslmode=disable" down
