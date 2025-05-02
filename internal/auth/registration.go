@@ -84,7 +84,7 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/home", http.StatusSeeOther)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		log.Printf("Пользователь с почтой %s зарегистрирован", email)
 		log.Printf("ID пользователя с почтой %s в базе данных: %d", email, GetUserIdFromDB(email, Password))
 		token, _ := GenerateJWToken(email, Password)
