@@ -7,7 +7,7 @@ services:
       - DB_HOST=db
     env_file:
       - ./internal/database/DB_Config.env
-      - ./internal/database/secretHash.env
+      - ./internal/database/ЫecretHash.env
     # command: sh -c "./wait-for.sh db:5432 -- ./main"
     depends_on:
       db:
