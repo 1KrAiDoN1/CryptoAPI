@@ -98,7 +98,7 @@ func SendUserRegistrationData(w http.ResponseWriter, r *http.Request) {
 
 func Hash(Password string) string {
 	hash := sha1.New()
-	err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/secretHash.env")
+	err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/SecretHash.env")
 	if err != nil {
 		log.Fatal(err)
 	}

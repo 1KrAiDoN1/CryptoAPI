@@ -11,7 +11,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY *.env ./
 COPY internal/database/DB_Config.env ./internal/database/DB_Config.env
-COPY internal/database/secretHash.env ./internal/database/secretHash.env
+COPY internal/database/secretHash.env ./internal/database/SecretHash.env
 
 
 # Копируем шаблоны
