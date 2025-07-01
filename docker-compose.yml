@@ -5,14 +5,10 @@ services:
     build: .
     ports:
       - "8080:8080"
+    env_file:
+      - .env  # Все секреты берутся из этого файла
     environment:
       DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      SECRET_STRING: ${SECRET_STRING}
-      SECRET_SIGNINKEY: ${SECRET_SIGNINKEY}
     depends_on:
       db:
         condition: service_healthy
@@ -20,10 +16,8 @@ services:
 
   db:
     image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - .env  # Те же переменные для БД
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
