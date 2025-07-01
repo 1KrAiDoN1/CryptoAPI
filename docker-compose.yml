@@ -1,14 +1,18 @@
+version: '3.8'
+
 services:
   cryptoapi:
     build: .
     ports:
       - "8080:8080"
     environment:
-      - DB_HOST=db
-    env_file:
-      - ./internal/database/DB_Config.env
-      - ./internal/database/SecretHash.env
-    # command: sh -c "./wait-for.sh db:5432 -- ./main"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      SECRET_STRING: ${SECRET_STRING}
+      SECRET_SIGNINKEY: ${SECRET_SIGNINKEY}
     depends_on:
       db:
         condition: service_healthy
@@ -16,13 +20,15 @@ services:
 
   db:
     image: postgres:15-alpine
-    env_file:
-      - ./internal/database/DB_Config.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
