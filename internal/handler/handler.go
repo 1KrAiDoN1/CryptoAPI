@@ -210,7 +210,7 @@ func ShowPersonalAccount(w http.ResponseWriter, r *http.Request) {
 		// Можно показать частичные данные
 	}
 	data := DataUser{Email: email, TimeOfRegistration: timeOfRegistration, FavoriteCrypto: favoriteCrypto}
-	tmpl, err := template.New("personal_account.html").Funcs(template.FuncMap{"formatLargeNumber": format.FormatLargeNumber, "formatLargeNumberForPercent": format.FormatLargeNumberForPercent, "Float": format.Float}).ParseFiles("/Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/personal_account.html")
+	tmpl, err := template.New("personal_account.html").Funcs(template.FuncMap{"formatLargeNumber": format.FormatLargeNumber, "formatLargeNumberForPercent": format.FormatLargeNumberForPercent, "Float": format.Float}).ParseFiles("./pkg/templates/personal_account.html")
 	if err != nil {
 		log.Println("Ошибка при чтении шаблона", err)
 		http.Error(w, "Ошибка при чтении шаблона", http.StatusInternalServerError)
@@ -223,7 +223,7 @@ func ShowPersonalAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func Registration_window(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("/Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/registration.html")
+	tmpl, err := template.ParseFiles("./pkg/templates/registration.html")
 	if err != nil {
 		log.Print("Ошибка при чтении шаблона:", err)
 	}
@@ -235,7 +235,7 @@ func Registration_window(w http.ResponseWriter, r *http.Request) {
 }
 
 func Authorization_window(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("/Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/authorization.html")
+	tmpl, err := template.ParseFiles("./pkg/templates/authorization.html")
 	if err != nil {
 		log.Print("Ошибка при чтении шаблона:", err)
 	}
@@ -389,7 +389,7 @@ func ShowInfo(w http.ResponseWriter, r *http.Request) {
 	// Используем ParseFiles для загрузки шаблона из файла
 	tmpl, err := template.New("home.html").Funcs(template.FuncMap{
 		"formatLargeNumber": format.FormatLargeNumber, "formatLargeNumberForPercent": format.FormatLargeNumberForPercent, // Регистрируем функцию
-	}).ParseFiles("/Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/home.html")
+	}).ParseFiles("./pkg/templates/home.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -459,7 +459,7 @@ func ShowCryptoDetails(w http.ResponseWriter, r *http.Request) {
 	// Загружаем шаблон для страницы с деталями
 	tmpl, err := template.New("crypto_details.html").Funcs(template.FuncMap{
 		"formatLargeNumber": format.FormatLargeNumber, "formatLargeNumberForPercent": format.FormatLargeNumberForPercent, // Регистрируем функцию
-	}).ParseFiles("/Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/crypto_details.html")
+	}).ParseFiles("./pkg/templates/crypto_details.html")
 	if err != nil {
 		http.Error(w, "Ошибка при загрузке шаблона: "+err.Error(), http.StatusInternalServerError)
 		return

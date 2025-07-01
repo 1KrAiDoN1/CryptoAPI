@@ -29,7 +29,7 @@ func GenerateJWToken(email string, password string) (string, error) {
 		IssuedAt:  time.Now().Unix(),
 		ExpiresAt: time.Now().Add(TokenTTL).Unix(),
 	})
-	err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/SecretHash.env")
+	err := godotenv.Load("./internal/database/SecretHash.env")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,7 +66,7 @@ func ParseToken(access_token string) (int, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return 0, errors.New("unexpected signing method")
 		}
-		err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/SecretHash.env")
+		err := godotenv.Load("./internal/database/SecretHash.env")
 		if err != nil {
 			log.Println("Ошибка при чтении файла конфигурации")
 		}
@@ -113,7 +113,7 @@ func GetUserIdFromDB(email string, password string) int {
 
 func HashToken(Password string) string {
 	hash := sha1.New()
-	err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/SecretHash.env")
+	err := godotenv.Load("./internal/database/SecretHash.env")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -37,7 +37,7 @@ func ConnectDB() (*Storage, error) {
 }
 
 func GetDBconfig() DB {
-	err := godotenv.Load("/Users/pavelvasilev/Desktop/CryptoAPI/internal/database/DB_Config.env")
+	err := godotenv.Load("./internal/database/DB_Config.env")
 	if err != nil {
 		log.Println("Ошибка при чтении конфигурации базы данных")
 	}

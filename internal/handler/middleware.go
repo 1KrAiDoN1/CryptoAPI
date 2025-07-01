@@ -38,7 +38,7 @@ import (
 //
 // 4. With no valid tokens: redirects to /login
 func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		var userID int
 		jwtCookie, jwtErr := r.Cookie("access_token")
@@ -93,7 +93,7 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		}
 
-	}
+	})
 }
 
 func Remove_The_Old_Refresh_Token(userID int) error {
