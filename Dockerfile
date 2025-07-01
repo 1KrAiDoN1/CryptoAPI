@@ -13,7 +13,6 @@ COPY *.env ./
 COPY internal/database/DB_Config.env ./internal/database/DB_Config.env
 COPY internal/database/SecretHash.env ./internal/database/SecretHash.env
 
-
 # Копируем шаблоны
 COPY internal/database/ /Users/pavelvasilev/Desktop/CryptoAPI/internal/database/
 COPY pkg/templates/ /Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/
@@ -31,6 +30,8 @@ RUN go build -o main ./cmd/main.go
 
 
 CMD ["./main"]
+
+
 
 
 
