@@ -27,8 +27,6 @@
 # # Собираем приложение
 # RUN go build -o main ./cmd/main.go
 
-
-
 # CMD ["./main"]
 
 
@@ -38,19 +36,18 @@ WORKDIR /cryptoapi
 
 # Создаем нужные директории
 RUN mkdir -p ./pkg/templates/
-# RUN mkdir -p ./internal/database/
+RUN mkdir -p ./internal/database/
 
 # Копируем go.mod и go.sum и скачиваем зависимости
 COPY go.mod go.sum ./
 RUN go mod download
 
 # Копируем остальные необходимые файлы (без env)
-# COPY *.env ./
-# COPY internal/database/DB_Config.env ./internal/database/DB_Config.env
-# COPY internal/database/SecretHash.env ./internal/database/SecretHash.env
+COPY *.env ./
+
 
 # Копируем исходники и шаблоны
-# COPY internal/database/ ./internal/database/
+COPY internal/database/ ./internal/database/
 COPY pkg/templates/ ./pkg/templates/
 
 # Копируем весь проект
