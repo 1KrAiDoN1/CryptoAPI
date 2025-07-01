@@ -5,7 +5,7 @@ FROM golang:1.23.1-alpine AS builder
 WORKDIR /cryptoapi
 # Создаем структуру директорий
 RUN mkdir -p /Users/pavelvasilev/Desktop/CryptoAPI/pkg/templates/
-
+RUN mkdir -p /Users/pavelvasilev/Desktop/CryptoAPI/internal/database/
 # Копируем только необходимые файлы для зависимостей
 COPY go.mod go.sum ./
 RUN go mod download
